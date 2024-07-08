@@ -54,7 +54,7 @@ This project is a Point of Sale (POS) system designed to optimize retail operati
     ```
 
 
-For questions or collaboration, please contact me via [Twitter](https://twitter.com/Wa_ViGo) or email at [your.email@example.com](mailto:geralnede@gmail.com).
+For questions or collaboration, please contact me via [Twitter](https://twitter.com/Wa_ViGo) or email at [Gmail](mailto:geralnede@gmail.com).
 
 ## License
 This project is licensed under the MIT License.
