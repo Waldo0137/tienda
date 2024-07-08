@@ -22,7 +22,7 @@ class CategoryForm(forms.ModelForm):
             'description': forms.Textarea(attrs={
                 'class': 'form-control',
                 'placeholder': 'Ingrese información general Etc.',
-                'rows': 3,  # Ajusta aquí el número de filas, 3 filas más que el valor por defecto de 3
+                'rows': 3,  
             }),
             
         }

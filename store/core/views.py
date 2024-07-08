@@ -56,12 +56,12 @@ def login_user(request):
             resp['msg'] = "Incorrect username or password"
         return HttpResponse(json.dumps(resp),content_type='application/json')
 
-    #Logout
+    
 def logoutuser(request):
     logout(request)
     return redirect('/')
 
-# Create your views here.
+
 @login_required
 def home(request):
     now = datetime.now()
@@ -132,16 +132,14 @@ def password_reset_request(request):
         form = PasswordResetEmailForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data['email']
-            # Verificar que el campo 'email' tenga un formato básico de cadena
-            if '@' in email:  # Puedes ajustar esta lógica según tus necesidades
-                # Simulación de búsqueda de usuarios asociados (puedes adaptarlo según tus necesidades)
+            if '@' in email:
                 associated_users = User.objects.filter(email=email)
                 if associated_users.exists():
                     for user in associated_users:
                         subject = "Reset Your Password"
                         email_template_name = "core/password_reset_email.txt"
                         c = {
-                            "email": email,  # Utiliza el correo ingresado como una cadena genérica
+                            "email": email,
                             "uid": urlsafe_base64_encode(force_bytes(user.pk)),
                             "user": user,
                             'token': default_token_generator.make_token(user),
@@ -149,11 +147,11 @@ def password_reset_request(request):
                         email_content = render_to_string(email_template_name, c)
                         
                         try:
-                            # Simulación de envío de correo electrónico
+                            
                             print("Simulated Email Content:")
                             print(email_content)
                             
-                            # No envía realmente el correo, solo simula el éxito
+                            
                             messages.success(request, 'Se ha enviado un correo con instrucciones para resetear tu contraseña.')
                             return redirect('password_reset_confirm', uidb64=c['uid'], token=c['token'])
                         except BadHeaderError:
@@ -162,7 +160,7 @@ def password_reset_request(request):
                 else:
                     messages.error(request, 'No hay usuarios asociados a este correo electrónico.')
             else:
-                messages.error(request, 'Por favor, introduce un correo electrónico válido.')  # Mensaje para formato de cadena inválido
+                messages.error(request, 'Por favor, introduce un correo electrónico válido.')  
         else:
             messages.error(request, 'Por favor, corrige los errores en el formulario.')
     else:
@@ -170,30 +168,6 @@ def password_reset_request(request):
     return render(request=request, template_name="core/password_reset.html", context={"form": form})
 
 
-# def password_reset_confirm(request, uidb64, token):
-#     try:
-#         uid = force_str(urlsafe_base64_decode(uidb64))
-#         user = User.objects.get(pk=uid)  # Este es un ejemplo, adaptarlo según tu lógica
-#     except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-#         user = None
-    
-#     if user is not None and default_token_generator.check_token(user, token):
-#         if request.method == 'POST':
-#             form = SetPasswordForm(user, request.POST)
-#             if form.is_valid():
-#                 form.save()
-#                 messages.success(request, 'Tu contraseña ha sido actualizada con éxito.')
-#                 return redirect('login')  # Redirigir al login después de cambiar la contraseña
-#         else:
-#             # Pasar el correo electrónico al contexto del formulario
-#             form = SetPasswordForm(user)
-#             form.email = user.email  # Aquí asignamos el correo electrónico al formulario
-
-#         return render(request, 'core/password_reset_confirm.html', {'form': form, 'email': user.email})
-#     else:
-#         messages.error(request, 'El enlace de reseteo de contraseña es inválido o ha expirado.')
-#         return redirect('password_reset_request')  # Redirigir de nuevo a la solicitud de reseteo de contraseña
-    
 
 def password_reset_confirm(request, uidb64, token):
     try:

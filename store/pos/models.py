@@ -22,10 +22,10 @@ class Sales(models.Model):
     cliente = models.CharField(max_length=100, blank=True)  
 
     def save(self, *args, **kwargs):
-        if not self.pk or self.cliente == "Cliente 1":  # Si es una nueva instancia
-            # Obtener el número de ventas creadas en el día actual
+        if not self.pk or self.cliente == "Cliente 1": 
+            
             ventas_hoy = Sales.objects.filter(date_added__date=timezone.now().date()).count()
-            # Construir el valor de cliente como una cadena de texto "Cliente N"
+            
             self.cliente = f"Cliente {ventas_hoy + 1}"
             print("Cliente:", self.cliente) 
         super().save(*args, **kwargs)

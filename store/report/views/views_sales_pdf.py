@@ -29,7 +29,7 @@ from inventory.models import *
 from pos.models import *
 from report.forms import SalesReportForm, YearMonthForm, YearForm, DayForm, DateRangeForm, MONTH_CHOICES, MONTH_NAMES
 
-# Constantes globales
+
 
 MONTH_NAMES = [
     "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -37,18 +37,12 @@ MONTH_NAMES = [
 ]
 
 
-# Funciones auxiliares
+
 def is_leap_year(year):
-    """
-    Función para verificar si un año es bisiesto.
-    """
     return year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
 
 
 def is_valid_day(year, month, day):
-    """
-    Función para verificar si el día es válido para el mes y el año dados.
-    """
     if month in [4, 6, 9, 11]:
         return day <= 30
     elif month == 2:
@@ -67,11 +61,11 @@ class SalesReportView(LoginRequiredMixin, PermissionRequiredMixin,ListView):
     permission_required = 'report.view_sales' 
 
     def get_queryset(self):
-        # Obtenemos todas las ventas inicialmente
+
         queryset = super().get_queryset()
         form = self.form_class(self.request.GET)
 
-        # Filtramos las ventas según los datos del formulario
+
         if form.is_valid():
             start_date = form.cleaned_data.get('start_date')
             end_date = form.cleaned_data.get('end_date')
@@ -92,20 +86,20 @@ class SalesReportView(LoginRequiredMixin, PermissionRequiredMixin,ListView):
 
         context['form'] = form
 
-        # Calcular el conteo general de clientes
+
         total_clientes = self.get_queryset().values('id').distinct().count()
 
-        # Calcular la cantidad total de ítems vendidos
+
         total_items_vendidos = salesItems.objects.filter(sale__in=self.get_queryset()).aggregate(total=Sum('qty'))['total']
 
-        # Calcular la cantidad total de ingresos
+
         total_ingresos = self.get_queryset().aggregate(total=Sum('grand_total'))['total']
         total_ingresos = self.format_total(total_ingresos)
 
-        # Obtener todas las ventas ordenadas por fecha
+
         sales = self.get_queryset()
 
-        # Preparar los datos de ventas
+
         sale_data = []
         for sale in sales:
             data = {}
@@ -130,7 +124,7 @@ class SalesReportView(LoginRequiredMixin, PermissionRequiredMixin,ListView):
 
             sale_data.append(data)
 
-        # Agregar los cálculos al contexto
+    
         context['page_title'] = 'Sales Transactions'
         context['sale_data'] = sale_data
         context['total_clientes'] = total_clientes
@@ -140,12 +134,12 @@ class SalesReportView(LoginRequiredMixin, PermissionRequiredMixin,ListView):
         return context
 
     def format_total(self, total):
-        # Implementa tu lógica de formato aquí
+        
         return total
 
 class GeneratePDFSalesView(View):
     def get(self, request, *args, **kwargs):
-        user = request.user  # Obtiene el usuario autenticado
+        user = request.user  
 
         sale_data = Sales.objects.order_by('date_added').all()
 
@@ -178,27 +172,27 @@ class GeneratePDFSalesView(View):
         current_date = datetime.now()
         unique_key = str(uuid.uuid4())
 
-        # Renderiza el HTML de la plantilla con los datos
+        
         html_string = render_to_string('report/sales_pdf.html', {
             'sale_data': sale_details,
             'total_clientes': total_clientes,
             'total_items_vendidos': total_items_vendidos,
             'total_ingresos': total_ingresos,
             'current_date': current_date,
-            'username': user.username,  # Añade el nombre del usuario al contexto
-            'unique_key': unique_key,  # Añade la clave única al contexto
+            'username': user.username,  
+            'unique_key': unique_key,  
         })
 
-        # Crear una respuesta HTTP con el PDF
+        
         pdf_buffer = io.BytesIO()
         pisa_status = pisa.CreatePDF(
             io.BytesIO(html_string.encode("UTF-8")), dest=pdf_buffer, encoding='UTF-8')
 
-        # Si hay errores, muestra una cadena de errores en el PDF
+        
         if pisa_status.err:
             return HttpResponse('We had some errors <pre>' + html_string + '</pre>')
 
-        # Generar nombre del archivo con fecha y hora
+
         filename = f"reporte_ventas_general_{current_date.strftime('%Y%m%d_%H%M%S')}.pdf"
 
         response = HttpResponse(content_type='application/pdf')
@@ -206,21 +200,21 @@ class GeneratePDFSalesView(View):
         response.write(pdf_buffer.getvalue())
 
         return response
-# Asumiendo que tienes un formulario YearForm definido
+
 
 class GeneratePDFSalesYearView(FormView):
-    form_class = YearForm  # Asegúrate de tener definido tu formulario YearForm
-    template_name = 'report/sales_pdf_year.html'  # Asegúrate de que la ruta sea correcta
+    form_class = YearForm  
+    template_name = 'report/sales_pdf_year.html'  
 
     def form_valid(self, form):
         year = form.cleaned_data['year']
-        # Filtrar las ventas por año y obtener los totales directamente
+        
         sales = Sales.objects.filter(date_added__year=year)
         total_clientes = sales.values('cliente').distinct().count()
         total_items_vendidos = salesItems.objects.filter(sale__in=sales).aggregate(total=Sum('qty'))['total']
         total_ingresos = sales.aggregate(total=Sum('grand_total'))['total']
 
-        # Detalles de las ventas para el informe
+        
         sale_details = []
         for sale in sales:
             items = salesItems.objects.filter(sale=sale)
@@ -236,7 +230,7 @@ class GeneratePDFSalesYearView(FormView):
                 'total_items_sold': sum(products_list.values())
             })
 
-        # Generación del PDF usando xhtml2pdf
+        
         current_date = timezone.now()
         unique_key = str(uuid.uuid4())
         html_string = render_to_string('report/sales_pdf_year.html', {
@@ -399,7 +393,7 @@ class GeneratePDFSalesDayView(FormView):
 
         month_name = MONTH_NAMES[int(month) - 1]
 
-        # Validar la fecha
+        
         if not self.is_valid_day(year, int(month), day):
             messages.error(self.request, "La fecha ingresada no es válida.")
             return self.form_invalid(form)

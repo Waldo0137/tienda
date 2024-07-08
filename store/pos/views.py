@@ -19,7 +19,7 @@ from django.db import transaction
 @permission_required('pos.view_sales', raise_exception=True)
 def pos(request):
     
-    # self.fields['category'].queryset = Category.objects.all().order_by('name')
+    
     products = Products.objects.filter(status=1).order_by('name')
     product_json = []
     for product in products:
@@ -201,22 +201,6 @@ def receipt(request):
         "formatted_date": formatted_date,
     }
     return render(request, 'pos/receipt.html', context)
-
-                # <span>Fecha:</span> {{ transaction.date_added|date:"M d Y" }} <br>
-                # <span>Fecha:</span> {{ transaction.date_added|date:"d \de F Y" }}<br>
-# @login_required
-# @permission_required('pos.delete_sales', raise_exception=True)
-# def delete_sale(request):
-#     resp = {'status': 'failed', 'msg': ''}
-#     id = request.POST.get('id')
-#     try:
-#         Sales.objects.filter(id=id).delete()
-#         resp['status'] = 'success'
-#         messages.success(request, 'El registro de Venta fue eliminado.')
-#     except:
-#         resp['msg'] = "An error occurred"
-#     return HttpResponse(json.dumps(resp), content_type='application/json')
-
 
 @login_required
 @permission_required('pos.delete_sales', raise_exception=True)

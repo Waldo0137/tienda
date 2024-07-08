@@ -19,7 +19,7 @@ class SupplierList(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView
     
 class SupplierCreate(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
     model = Supplier
-    form_class = SupplierForm  # Especifica el formulario personalizado aquí
+    form_class = SupplierForm  
     template_name = 'purchases/supplier_create.html'
     success_url = reverse_lazy('purchase:supplier_list')
     permission_required = 'purchase.add_supplier'
@@ -71,7 +71,7 @@ class PurchaseList(LoginRequiredMixin,PermissionRequiredMixin, generic.ListView)
     
 class PurchaseCreate(LoginRequiredMixin,PermissionRequiredMixin, generic.CreateView):
     model = PurchaseProduct
-    form_class = PurchaseForm  # Especifica el formulario personalizado aquí
+    form_class = PurchaseForm  
     template_name = 'purchases/purchase_create.html'
     success_url = reverse_lazy('purchase:purchase_list')
     permission_required = 'purchase.add_purchaseproduct'
@@ -87,9 +87,6 @@ class PurchaseCreate(LoginRequiredMixin,PermissionRequiredMixin, generic.CreateV
         messages.error(self.request, "Hubo un error al crear la Compra. Por favor, intente de nuevo.")
         return self.render_to_response(self.get_context_data(form=form))
     
-    # !poner variables a los mensajes
-    # !modificar el status segun coste y cantidad y no se resta cantidad de un producto si se elimina un producto.
-    # toma en cuenta cantidad para deshabilitar pero no con costo
 class PurchaseUpdate(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
     model = PurchaseProduct
     form_class = PurchaseForm  
@@ -118,11 +115,11 @@ class PurchaseDelete(SuccessMessageMixin, PermissionRequiredMixin, generic.Delet
 
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
-        self.object.delete()  # Utiliza el método delete del modelo
+        self.object.delete()  
         return super().delete(request, *args, **kwargs)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['purchase'] = self.get_object()  # Asegúrate de tener la lógica correcta para obtener el objeto purchase
+        context['purchase'] = self.get_object() 
         return context
     

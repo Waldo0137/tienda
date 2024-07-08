@@ -24,19 +24,18 @@ from openpyxl import Workbook
 
 class SupplierExcelView(View):
     def get(self, request, *args, **kwargs):
-        # Obtener todos los proveedores
+
         suppliers = Supplier.objects.all()
 
-        # Crear un libro de trabajo de Excel
         wb = Workbook()
         ws = wb.active
         ws.title = "Proveedores"
 
-        # Definir los encabezados de las columnas
+
         headers = ['Proveedor', 'Información de contacto', 'Fecha de registro']
         ws.append(headers)
 
-        # Agregar datos de los proveedores al archivo Excel
+
         for supplier in suppliers:
             supplier_data = [
                 supplier.name,
@@ -45,7 +44,7 @@ class SupplierExcelView(View):
             ]
             ws.append(supplier_data)
 
-        # Configurar la respuesta HTTP con el archivo Excel generado
+
         current_date = datetime.now()
         filename = f"lista_proveedores_{current_date.strftime('%Y%m%d_%H%M%S')}.xlsx"
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
@@ -59,16 +58,16 @@ class SupplierProductExcelView(View):
     def get(self, request):
         suppliers = Supplier.objects.prefetch_related('purchaseproduct_set__product').all()
 
-        # Crear un libro de trabajo de Excel y seleccionar la hoja activa
+        
         wb = Workbook()
         ws = wb.active
         ws.title = "Proveedores y Productos"
 
-        # Definir los encabezados de las columnas
+        
         headers = ['Proveedor', 'Producto', 'Costo', 'Cantidad', 'Fecha de Adquisición']
         ws.append(headers)
 
-        # Agregar datos de los proveedores y productos al archivo Excel
+        
         for supplier in suppliers:
             purchase_products = supplier.purchaseproduct_set.all()
             for purchase in purchase_products:
@@ -81,13 +80,13 @@ class SupplierProductExcelView(View):
                 ]
                 ws.append(product_data)
 
-        # Configurar la respuesta HTTP con el archivo Excel generado
+        
         current_date = datetime.now()
         filename = f"lista_proveedores_productos_{current_date.strftime('%Y%m%d_%H%M%S')}.xlsx"
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
 
-        # Guardar el archivo Excel en la respuesta HTTP
+        
         wb.save(response)
 
         return response
@@ -97,16 +96,16 @@ class ProductExcelView(View):
     def get(self, request, *args, **kwargs):
         products = Products.objects.all().order_by('name')
 
-        # Crear un libro de trabajo de Excel
+
         wb = openpyxl.Workbook()
         ws = wb.active
         ws.title = "Productos"
 
-        # Definir los encabezados de las columnas
+
         headers = ['Nombre', 'Descripción', 'Fecha agregado']
         ws.append(headers)
 
-        # Agregar datos de los productos al archivo Excel
+
         for product in products:
             product_data = [
                 product.name,
@@ -115,14 +114,14 @@ class ProductExcelView(View):
             ]
             ws.append(product_data)
 
-        # Configurar la respuesta HTTP con el archivo Excel generado
+
         current_date = datetime.now()
         filename = f"lista_productos_{current_date.strftime('%Y%m%d_%H%M%S')}.xlsx"
 
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
 
-        # Guardar el libro de trabajo en la respuesta HTTP
+
         wb.save(response)
 
         return response
@@ -131,16 +130,16 @@ class ProductQtyExcelView(View):
     def get(self, request, *args, **kwargs):
         products = Products.objects.all().order_by('name')
 
-        # Crear un libro de trabajo de Excel
+
         wb = openpyxl.Workbook()
         ws = wb.active
         ws.title = "Productos"
 
-        # Definir los encabezados de las columnas
+    
         headers = ['Nombre', 'Descripción', 'Fecha de agregado', 'Cantidad', 'Precio', 'Costo']
         ws.append(headers)
 
-        # Agregar datos de los productos al archivo Excel
+
         for product in products:
             product_data = [
                 product.name,
@@ -152,14 +151,14 @@ class ProductQtyExcelView(View):
             ]
             ws.append(product_data)
 
-        # Configurar la respuesta HTTP con el archivo Excel generado
+
         current_date = datetime.now()
         filename = f"lista_productos_detalles_{current_date.strftime('%Y%m%d_%H%M%S')}.xlsx"
 
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
 
-        # Guardar el libro de trabajo en la respuesta HTTP
+
         wb.save(response)
 
         return response
@@ -173,7 +172,7 @@ class MixExcelSalesDayView(FormView):
         month = int(form.cleaned_data['month'])
         day = int(form.cleaned_data['day'])
 
-        # Definir el rango de fechas desde las 3 AM del día especificado
+    
         start_date = datetime(year, month, day, 3, 0, 0)
         end_date = start_date + timedelta(days=1)
         date_screen = datetime(year, month ,day)
@@ -182,12 +181,12 @@ class MixExcelSalesDayView(FormView):
         day_name_english = start_date.strftime('%A')  
         day_name = DAYS_OF_WEEK[day_name_english]  
 
-        # Validar la fecha
+    
         if not self.is_valid_day(year, month, day):
             messages.error(self.request, "La fecha ingresada no es válida.")
             return self.form_invalid(form)
 
-        # Filtrar ventas dentro del rango de fechas
+    
         sales = Sales.objects.filter(date_added__gte=start_date, date_added__lt=end_date)
         total_clientes = sales.values('id').distinct().count()
         total_items_vendidos = salesItems.objects.filter(sale__in=sales).aggregate(total=Sum('qty'))['total']
@@ -239,7 +238,7 @@ class MixExcelSalesDayView(FormView):
                     sale['net_profit']
                 ])
 
-        # Agregar un resumen al final del archivo
+    
         sheet.append([])
         sheet.append(["Total Clientes", total_clientes])
         sheet.append(["Total Items Vendidos", total_items_vendidos])
@@ -247,11 +246,11 @@ class MixExcelSalesDayView(FormView):
         sheet.append(["Ganancia Neta Total", total_net_profit])
         
         sheet.append(["Fecha para la Solicitud", date_screen.strftime('%Y-%m-%d')])
-        # Generar la respuesta HTTP con el archivo Excel
+    
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         response['Content-Disposition'] = f'attachment; filename=reporte_cierreventas_diario_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
         
-        # Guardar el archivo Excel en un buffer
+    
         buffer = io.BytesIO()
         workbook.save(buffer)
         response.write(buffer.getvalue())
@@ -278,17 +277,17 @@ class MixTramoExcelSalesDayView(FormView):
         end_month = int(form.cleaned_data['end_month'])
         end_day = int(form.cleaned_data['end_day'])
         
-        # Validar que la fecha de inicio no sea mayor que la fecha fin
+    
         if not self.is_valid_date_range(start_year, start_month, start_day, end_year, end_month, end_day):
             messages.error(self.request, "La fecha de inicio no puede ser mayor que la fecha de fin.")
             return self.form_invalid(form)
 
-        # Definir el rango de fechas desde las 3 AM de la fecha de inicio
+    
         start_date = datetime(start_year, start_month, start_day, 3, 0, 0)
         end_date = datetime(end_year, end_month, end_day, 3, 0, 0) + timedelta(days=1)
         start_screen = datetime(start_year, start_month, start_day)
         end_date_display = datetime(end_year, end_month, end_day)
-        # Validar la fecha de inicio y fin
+    
         if not self.is_valid_day(start_year, start_month, start_day) or not self.is_valid_day(end_year, end_month, end_day):
             messages.error(self.request, "Una de las fechas ingresadas no es válida.")
             return self.form_invalid(form)
@@ -298,7 +297,7 @@ class MixTramoExcelSalesDayView(FormView):
         day_name_end_english = end_date_display.strftime('%A')
         day_name_end = DAYS_OF_WEEK[day_name_end_english]  
         
-        # Filtrar ventas dentro del rango de fechas
+    
         sales = Sales.objects.filter(date_added__gte=start_date, date_added__lt=end_date)
         total_clientes = sales.values('id').distinct().count()
         total_items_vendidos = salesItems.objects.filter(sale__in=sales).aggregate(total=Sum('qty'))['total']
@@ -331,12 +330,12 @@ class MixTramoExcelSalesDayView(FormView):
         return self.generate_excel(sale_details, total_clientes, total_items_vendidos, total_ingresos, total_net_profit, start_year, start_month, start_day, end_year, end_month, end_day, day_name_start, day_name_end, start_screen, end_date_display)
 
     def generate_excel(self, sale_details, total_clientes, total_items_vendidos, total_ingresos, total_net_profit, start_year, start_month, start_day, end_year, end_month, end_day, day_name_start, day_name_end, start_screen, end_date_display):
-        # Crear el archivo Excel
+    
         workbook = Workbook()
         sheet = workbook.active
         sheet.title = "Reporte de Ventas Diario"
 
-        # Escribir los encabezados del reporte
+    
         sheet.append(["Fecha", "Cliente", "Producto", "Cantidad", "Precio", "Costo", "Ganancia Neta"])
         for sale in sale_details:
             for product, details in sale['products_list'].items():
@@ -350,7 +349,7 @@ class MixTramoExcelSalesDayView(FormView):
                     sale['net_profit']
                 ])
 
-        # Agregar un resumen al final del archivo
+    
         sheet.append([])
         sheet.append(["Total Clientes", total_clientes])
         sheet.append(["Total Items Vendidos", total_items_vendidos])
@@ -359,11 +358,11 @@ class MixTramoExcelSalesDayView(FormView):
         sheet.append(["Fecha Inicio", start_screen.strftime('%Y-%m-%d')])
         sheet.append(["Fecha Fin", end_date_display.strftime('%Y-%m-%d')])
 
-        # Generar la respuesta HTTP con el archivo Excel
+    
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         response['Content-Disposition'] = f'attachment; filename=reporte_cierreventas_tramo_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
         
-        # Guardar el archivo Excel en un buffer
+    
         buffer = io.BytesIO()
         workbook.save(buffer)
         response.write(buffer.getvalue())

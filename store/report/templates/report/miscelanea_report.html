@@ -25,31 +25,31 @@
     
     .horizontal-fields input,
     .horizontal-fields select {
-        flex-grow: 1; /* Hace que los elementos ocupen todo el espacio disponible */
-        min-width: 0; /* Permite que los elementos se hagan más grandes que su tamaño mínimo */
+        flex-grow: 1; 
+        min-width: 0; 
     }
     
     .horizontal-fields {
         display: flex;
-        gap: 20px; /* Espacio entre elementos */
+        gap: 20px; 
     }
     .horizontal-fields .mdc-text-field__input {
-        width: 100%; /* Ajusta el ancho de los inputs y selects */
-        max-width: 150px; /* Ancho máximo para evitar que se extiendan demasiado */
+        width: 100%;
+        max-width: 150px;
     }
     .custom-year-input {
         border-radius: 5px;
         padding: 10px;
         font-size: 16px;
         background-color: #f8f9fa;
-        /* Color de fondo ligero */
+        
         border: 1px solid #ced4da;
-        /* Borde suave */
+        
     }
 
     .button-group.d-flex.justify-content-start.mdc-button {
         margin-left: 10px;
-        /* Espacio entre los botones */
+        
     }
 
     .custom-year-input,
@@ -65,18 +65,18 @@
         margin-left: 10px;
     }
     .mdc-layout-grid__cell.stretch-card {
-        width: 100%; /* Ancho completo del contenedor */
+        width: 100%; 
     }
     .mdc-card {
-        padding: 20px; /* Espacio interno para mejor apariencia */
+        padding: 20px;
     }
     .horizontal-fields {
         display: flex;
-        gap: 20px; /* Espacio entre elementos */
+        gap: 20px;
     }
     .horizontal-fields .mdc-text-field__input {
-        width: 100%; /* Ajusta el ancho de los inputs y selects */
-        max-width: 200px; /* Ancho máximo para evitar que se extiendan demasiado */
+        width: 100%;
+        max-width: 200px; 
     }
 </style>
 
@@ -218,7 +218,7 @@
             {% csrf_token %}
             <div class="mdc-layout-grid">
                 <div class="mdc-layout-grid__inner">
-                    <!-- Primer bloque de fecha -->
+                    
                     <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-10">
                         <h6 class="card-subtitle">Fecha de Inicio</h6>
                         <div class="horizontal-fields">
@@ -243,7 +243,7 @@
                                 class="mdc-text-field__input" min="2023" max="{{ max_year }}">
                         </div>
                     </div>
-                    <!-- Segundo bloque de fecha -->
+                    
                     <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-10">
                         <h6 class="card-subtitle">Fecha de Fin</h6>
                         <div class="horizontal-fields">
@@ -270,7 +270,7 @@
                     </div>
                 </div>
             </div>
-            <!-- Botones de Acción -->
+            
             
             <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-4">
                 <button type="button" class="mdc-button mdc-button--raised mdc-button--dense mdc-button--outlined icon-button" onclick="generateDaySectionPDF()">

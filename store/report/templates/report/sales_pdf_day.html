@@ -3,7 +3,6 @@
 <head>
     <title>Reporte de Ventas</title>
     <style>
-        /* Añade aquí tus estilos CSS para el PDF */
         body {
             font-family: Arial, sans-serif;
             size: letter; 
@@ -22,7 +21,7 @@
             border-top: 1px solid #000;
         }
         .content {
-            margin-top: 100px; /* Ajustado para que el contenido no quede oculto por el encabezado fijo */
+            margin-top: 100px;
             margin-bottom: 50px;
         }
         table {
@@ -42,7 +41,6 @@
             margin-top: 20px;
             text-align: left;
         }
-        /* Estilos específicos para los anchos de columna */
         .col-clientes {
             width: 15%;
         }
@@ -50,7 +48,7 @@
             width: 20%;
         }
         .col-productos {
-            width: 40%; /* Ancho mayor para productos */
+            width: 40%;
         }
         .col-total {
             width: 15%;
@@ -62,9 +60,8 @@
 </head>
 <body>
     <header>
-        <h2>FREYCAR</h2>
         <p>Reporte de Ventas - Generado el: {{ current_date|date:'d-m-Y H:i' }}</p>
-        <p>Usuario: {{ username }}</p> <!-- Muestra el nombre del usuario -->
+        <p>Usuario: {{ username }}</p> 
     </header>
     <div class="content">
         <h2>Reporte Diario de Ventas</h2>
@@ -110,8 +107,7 @@
         </table>
     </div>
     <footer>
-        <!-- <p>Contact: example@example.com | Tel: 123-456-7890 | Web: www.example.com</p> -->
-        <p style="text-align: right;">Clave Única: {{ unique_key }}</p> <!-- Muestra la clave única en el pie de página -->
+        <p style="text-align: right;">Clave Única: {{ unique_key }}</p> 
     </footer>
 </body>
 </html>

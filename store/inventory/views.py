@@ -97,7 +97,6 @@ class CategoryDelete(LoginRequiredMixin, SuccessMessageMixin,PermissionRequiredM
         return self.delete(request, *args, **kwargs)
 
 
-# Vistas basadas en clase para Products
 
 class ProductDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
     model = Products

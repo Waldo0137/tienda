@@ -4,7 +4,6 @@
 <head>
     <title>Reporte de Ganancias</title>
 
-    <!-- Estilos CSS -->
     <style type="text/css">
         body {
             font-family: Arial, sans-serif;
@@ -73,52 +72,52 @@
 
         
         .report-cell-cliente {
-            width: 20%; /* Ajusta el ancho de la columna cliente según sea necesario */
+            width: 20%; 
     
     
-            white-space: nowrap; /* Evitar salto de línea */
-            overflow: hidden; /* Ocultar el desbordamiento */
-            text-overflow: ellipsis; /* Añadir puntos suspensivos si el texto es demasiado largo */
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis;
     
         }
         .report-cell-fagregado {
-            width: 15%; /* Ancho de la columna productos */
+            width: 15%; 
             
-            white-space: nowrap; /* Evitar salto de línea */
-            overflow: hidden; /* Ocultar el desbordamiento */
+            white-space: nowrap; 
+            overflow: hidden; 
             text-overflow: ellipsis;
         }
         .report-cell-productos {
-            width: 24%; /* Ancho de la columna productos */
+            width: 24%; 
 
-            white-space: nowrap; /* Evitar salto de línea */
-            overflow: hidden; /* Ocultar el desbordamiento */
-            text-overflow: ellipsis; /* Añadir puntos suspensivos si el texto es demasiado largo */
+            white-space: nowrap;
+            overflow: hidden; 
+            text-overflow: ellipsis; 
             
         }
         
         .report-cell-total {
-            width: 20%; /* Ancho de la columna productos */
+            width: 20%; 
             
-            white-space: nowrap; /* Evitar salto de línea */
-            overflow: hidden; /* Ocultar el desbordamiento */
+            white-space: nowrap; 
+            overflow: hidden; 
             text-overflow: ellipsis;
         }
         
         .report-cell-titems {
-            width: 25%; /* Ancho de la columna productos */
+            width: 25%; 
 
             
-            white-space: nowrap; /* Evitar salto de línea */
-            overflow: hidden; /* Ocultar el desbordamiento */
+            white-space: nowrap; 
+            overflow: hidden; 
             text-overflow: ellipsis;
         }
 
         .report-cell {
-            padding: 1px; /* Ajusta el padding para controlar el alto de las celdas */
+            padding: 1px;
             border: 1px solid #000;
             text-align: center;
-            line-height: 1; /* Ajusta según tus necesidades */
+            line-height: 1; 
         }
 
         
@@ -126,7 +125,6 @@
 </head>
 <body>
     <header>
-        <h2>FREYCAR</h2>
         <p>Reporte de Ganancias - Generado el: {{ current_date|date:'d-m-Y H:i' }}</p>
         <p>Usuario: {{ username }}</p>
     </header>
@@ -154,7 +152,7 @@
                     <td>{{ sale.costo_total|floatformat:2|intcomma }} Bs - {{ product.total_qty_vendida }} unidades</td>
                     <td>{{ product.product_ganancia|floatformat:2|intcomma }} Bs </td>
                     <td>{{ product.total_gasto_compras|floatformat:2|intcomma }}  Bs - {{ product.total_qty_comprada }} unidades</td>
-                    <td>{{ product.ganancia_bruta|floatformat:2|intcomma }} Bs</td> <!-- Nuevo campo -->
+                    <td>{{ product.ganancia_bruta|floatformat:2|intcomma }} Bs</td> 
                     
                 </tr>
                 {% endfor %}

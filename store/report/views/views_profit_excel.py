@@ -1,5 +1,5 @@
 from pos.models import Sales
-from purchase.models import PurchaseProduct  # Asegúrate de ajustar según la ubicación de tus modelos
+from purchase.models import PurchaseProduct
 from report.forms import *
 from datetime import datetime
 from decimal import Decimal
@@ -31,10 +31,10 @@ class GenerateExcelProfitView(View):
             username = request.user.username
             unique_key = str(uuid.uuid4())
 
-            # Generar el archivo Excel
+            
             excel_file = self.generate_excel_file(sales_data)
 
-            # Configurar la respuesta HTTP con el archivo Excel generado
+            
             response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
             response['Content-Disposition'] = f'attachment; filename="reporte_ganancias_general_{current_date.strftime("%Y%m%d_%H%M%S")}.xlsx"'
             response.write(excel_file.getvalue())
@@ -170,7 +170,7 @@ class GenerateExcelProfitView(View):
             adjusted_width = (max_length + 2) * 1.2
             ws.column_dimensions[column].width = adjusted_width
 
-        # Guardar el archivo en memoria
+
         excel_file = BytesIO()
         wb.save(excel_file)
         excel_file.seek(0)
@@ -197,10 +197,10 @@ class YearlyExcelProfitView(View):
             username = request.user.username
             unique_key = str(uuid.uuid4())
 
-            # Generar el archivo Excel
+
             excel_file = self.generate_excel_file(sales_data)
 
-            # Configurar la respuesta HTTP con el archivo Excel generado
+
             response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
             response['Content-Disposition'] = f'attachment; filename="reporte_ganancias_anual_{year}_{current_date.strftime("%Y%m%d_%H%M%S")}.xlsx"'
             response.write(excel_file.getvalue())
@@ -288,7 +288,7 @@ class YearlyExcelProfitView(View):
         ws = wb.active
         ws.title = "Reporte de Ganancias"
 
-        # Encabezado
+    
         headers = [
             "Fecha de Venta", "Nombre del Producto", "Costo por Unidad", "Cantidad Vendida",
             "Cantidad Comprada", "Ganancia por Producto", "Estado de Ganancia", "Total de Gasto en Compras",
@@ -296,7 +296,7 @@ class YearlyExcelProfitView(View):
         ]
         ws.append(headers)
 
-        # Datos
+    
         for sale in sales_data:
             for product in sale['products_list']:
                 row = [
@@ -312,7 +312,7 @@ class YearlyExcelProfitView(View):
                 ]
                 ws.append(row)
 
-        # Ajustar el ancho de las columnas
+    
         for col in ws.iter_cols(min_col=1, max_col=ws.max_column):
             max_length = 0
             column = col[0].column_letter
@@ -325,7 +325,7 @@ class YearlyExcelProfitView(View):
             adjusted_width = (max_length + 2) * 1.2
             ws.column_dimensions[column].width = adjusted_width
 
-        # Guardar el archivo en memoria
+    
         excel_file = BytesIO()
         wb.save(excel_file)
         excel_file.seek(0)
@@ -353,10 +353,10 @@ class MonthlyExcelProfitView(FormView):
             username = request.user.username
             unique_key = str(uuid.uuid4())
 
-            # Generar el archivo Excel
+        
             excel_file = self.generate_excel_file(sales_data)
 
-            # Configurar la respuesta HTTP con el archivo Excel generado
+        
             response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
             response['Content-Disposition'] = f'attachment; filename="reporte_ganancias_mensual_{month}_{year}_{current_date.strftime("%Y%m%d_%H%M%S")}.xlsx"'
             response.write(excel_file.getvalue())
@@ -444,7 +444,7 @@ class MonthlyExcelProfitView(FormView):
         ws = wb.active
         ws.title = "Reporte de Ganancias"
 
-        # Encabezado
+        
         headers = [
             "Fecha de Venta", "Nombre del Producto", "Costo por Unidad", "Cantidad Vendida",
             "Cantidad Comprada", "Ganancia por Producto", "Estado de Ganancia", "Total de Gasto en Compras",
@@ -452,7 +452,7 @@ class MonthlyExcelProfitView(FormView):
         ]
         ws.append(headers)
 
-        # Datos
+        
         for sale in sales_data:
             for product in sale['products_list']:
                 row = [
@@ -468,7 +468,7 @@ class MonthlyExcelProfitView(FormView):
                 ]
                 ws.append(row)
 
-        # Ajustar el ancho de las columnas
+
         for col in ws.iter_cols(min_col=1, max_col=ws.max_column):
             max_length = 0
             column = col[0].column_letter
@@ -481,7 +481,7 @@ class MonthlyExcelProfitView(FormView):
             adjusted_width = (max_length + 2) * 1.2
             ws.column_dimensions[column].width = adjusted_width
 
-        # Guardar el archivo en memoria
+
         excel_file = BytesIO()
         wb.save(excel_file)
         excel_file.seek(0)
@@ -490,7 +490,7 @@ class MonthlyExcelProfitView(FormView):
 
 
 class DailyExcelProfitView(FormView):
-    template_name = 'your_template.html'  # Nombre de tu plantilla HTML con el formulario
+    template_name = 'your_template.html'
     form_class = DayMonthYearReportForm
 
     def form_valid(self, form):
@@ -512,10 +512,10 @@ class DailyExcelProfitView(FormView):
         username = self.request.user.username
         unique_key = str(uuid.uuid4())
 
-        # Generar el archivo Excel
+        
         excel_file = self.generate_excel_file(sales_data)
 
-        # Configurar la respuesta HTTP con el archivo Excel generado
+        
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         response['Content-Disposition'] = f'attachment; filename="reporte_ganancias_diaria_{day}_{month}_{year}_{current_date.strftime("%Y%m%d_%H%M%S")}.xlsx"'
         response.write(excel_file.getvalue())
@@ -606,7 +606,7 @@ class DailyExcelProfitView(FormView):
         ws = wb.active
         ws.title = "Reporte de Ganancias"
 
-        # Encabezado
+        
         headers = [
             "Fecha de Venta", "Nombre del Producto", "Costo por Unidad", "Cantidad Vendida",
             "Cantidad Comprada", "Ganancia por Producto", "Estado de Ganancia", "Total de Gasto en Compras",
@@ -614,7 +614,7 @@ class DailyExcelProfitView(FormView):
         ]
         ws.append(headers)
 
-        # Datos
+        
         for sale in sales_data:
             for product in sale['products_list']:
                 row = [
@@ -630,7 +630,7 @@ class DailyExcelProfitView(FormView):
                 ]
                 ws.append(row)
 
-        # Ajustar el ancho de las columnas
+        
         for col in ws.iter_cols(min_col=1, max_col=ws.max_column):
             max_length = 0
             column = col[0].column_letter
@@ -643,7 +643,7 @@ class DailyExcelProfitView(FormView):
             adjusted_width = (max_length + 2) * 1.2
             ws.column_dimensions[column].width = adjusted_width
 
-        # Guardar el archivo en memoria
+        
         excel_file = BytesIO()
         wb.save(excel_file)
         excel_file.seek(0)

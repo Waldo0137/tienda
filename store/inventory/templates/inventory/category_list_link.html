@@ -2,10 +2,9 @@
 
 {% block pageContent %}
 <style>
-  /* Estilos para las celdas de la tabla */
   #miTabla td {
-    padding: 0.5rem; /* Espaciado interno reducido */
-    font-size: 0.9rem; /* Tamaño de fuente reducido */
+    padding: 0.5rem; 
+    font-size: 0.9rem;
     text-align: center;
   }
 </style>
@@ -54,7 +53,7 @@
         "responsive": true,
         "lengthChange": false,
         "autoWidth": false,
-        "order": [[1, "desc"]],  // Corrige el índice de la columna de ordenación
+        "order": [[1, "desc"]],  
         "buttons": ['copy', 'csv', 'excel', 'pdf', 'print', 'colvis']
       }).buttons().container().appendTo('#miTabla_wrapper .col-md-6:eq(0)');
     });

@@ -62,27 +62,27 @@ class GenerateExcelSalesView(View):
     def post(self, request, *args, **kwargs):
         form = ReportForm(request.POST)
         if form.is_valid():
-            # Si no se especifica ningún modo, mostrar todas las ventas
+            
             sales = Sales.objects.all()
 
-            # Calcular el conteo general de clientes
+            
             total_clientes = Sales.objects.values('id').distinct().count()
 
-            # Calcular la cantidad total de ítems vendidos
+            
             total_items_vendidos = salesItems.objects.aggregate(total=Sum('qty'))['total']
 
-            # Calcular la cantidad total de ingresos
+            
             total_ingresos = Sales.objects.aggregate(total=Sum('grand_total'))['total']
 
-            # Crear un libro de trabajo de Excel
+            
             wb = Workbook()
             ws = wb.active
 
-            # Agregar encabezados
+            
             headers = ['Cliente', 'Fecha', 'Productos', 'Total', 'Cantidad Total de Ítems']
             ws.append([''] + headers)
 
-            # Agregar datos de ventas
+            
             for sale in sales:
                 items = salesItems.objects.filter(sale=sale).all()
                 products_list = {}
@@ -99,31 +99,31 @@ class GenerateExcelSalesView(View):
                 sale_data = [
                     '',
                     sale.cliente,
-                    sale.date_added.strftime('%Y-%m-%d %H:%M'),  # Formato de fecha personalizado
-                    ', '.join([f"{product}: {quantity}" for product, quantity in products_list.items()]),  # Lista de productos como cadena
+                    sale.date_added.strftime('%Y-%m-%d %H:%M'),  
+                    ', '.join([f"{product}: {quantity}" for product, quantity in products_list.items()]),  
                     sale.grand_total,
                     total_items_sold
                 ]
 
                 ws.append(sale_data)
 
-            # Agregar fila para los totales
+            
             total_row = ['Total General:', total_clientes, '', '', total_ingresos, total_items_vendidos]
             ws.append(total_row)
 
-            # Ajustar alineación de celdas
+            
             for row in ws.iter_rows(min_row=1, max_row=ws.max_row):
                 for cell in row:
-                    if cell.column in [2, 3, 4]:  # Alinear a la izquierda las columnas Cliente, Fecha, Productos
+                    if cell.column in [2, 3, 4]:  
                         cell.alignment = Alignment(horizontal='left')
-                    elif cell.column in [5, 6, 7]:  # Alinear a la derecha las columnas Total, Cantidad Total de Ítems
+                    elif cell.column in [5, 6, 7]:  
                         cell.alignment = Alignment(horizontal='right')
 
-            # Alinear la celda "Total General:" a la izquierda
+            
             total_general_cell = ws['A' + str(ws.max_row)]
             total_general_cell.alignment = Alignment(horizontal='left')
 
-            # Alinear los totales a la derecha
+            
             total_clientes_cell = ws['B' + str(ws.max_row)]
             total_clientes_cell.alignment = Alignment(horizontal='right')
 
@@ -134,7 +134,7 @@ class GenerateExcelSalesView(View):
             total_items_vendidos_cell.alignment = Alignment(horizontal='right')
 
             current_date = datetime.now()
-            # Guardar el libro de trabajo en una respuesta HTTP
+            
             response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
             response['Content-Disposition'] = f'attachment; filename=reporte_ventas_general_{current_date.strftime("%Y%m%d_%H%M%S")}.xlsx'
 
@@ -150,26 +150,26 @@ class GenerateExcelSalesYearView(View):
         if form.is_valid():
             year = form.cleaned_data.get('year')
 
-            # Filtrar las ventas por año
+            
             sales = Sales.objects.filter(date_added__year=year)
 
-            # Calcular el total de clientes únicos
+            
             total_clientes = Sales.objects.filter(date_added__year=year).values('id').distinct().count()
 
-            # Calcular el total de ítems vendidos y los ingresos totales
+            
             total_items_vendidos = salesItems.objects.filter(sale__in=sales).aggregate(total=Sum('qty'))['total']
             total_ingresos = sales.aggregate(total=Sum('grand_total'))['total']
 
-            # Crear un libro de trabajo de Excel
+            
             wb = Workbook()
             ws = wb.active
 
             ws.append([f"Reporte de Ventas: del {year}"])
-            # Agregar encabezados
+            
             headers = ['Cliente', 'Fecha', 'Productos', 'Total', 'Cantidad Total de Ítems']
             ws.append([''] + headers)
 
-            # Agregar datos de ventas
+            
             for sale in sales:
                 items = salesItems.objects.filter(sale=sale).all()
                 products_list = {}
@@ -182,7 +182,7 @@ class GenerateExcelSalesYearView(View):
 
                 total_items_sold = sum(products_list.values())
 
-                # Formatear los datos según sea necesario
+                
                 sale_data = [
                     '',
                     sale.cliente,
@@ -194,23 +194,23 @@ class GenerateExcelSalesYearView(View):
 
                 ws.append(sale_data)
 
-            # Agregar fila para los totales
+            
             total_row = ['Total General:', total_clientes, '', '', total_ingresos, total_items_vendidos]
             ws.append(total_row)
 
-            # Ajustar alineación de celdas
+            
             for row in ws.iter_rows(min_row=1, max_row=ws.max_row):
                 for cell in row:
-                    if cell.column in [2, 3, 4]:  # Alinear a la izquierda las columnas Cliente, Fecha, Productos
+                    if cell.column in [2, 3, 4]: 
                         cell.alignment = Alignment(horizontal='center')
-                    elif cell.column in [5, 6, 7]:  # Alinear a la derecha las columnas Total, Cantidad Total de Ítems
+                    elif cell.column in [5, 6, 7]: 
                         cell.alignment = Alignment(horizontal='center')
 
-            # Alinear la celda "Total General:" a la izquierda
+            
             total_general_cell = ws['A' + str(ws.max_row)]
             total_general_cell.alignment = Alignment(horizontal='center')
 
-            # Alinear los totales a la derecha
+            
             total_clientes_cell = ws['B' + str(ws.max_row)]
             total_clientes_cell.alignment = Alignment(horizontal='center')
 
@@ -221,7 +221,7 @@ class GenerateExcelSalesYearView(View):
             total_items_vendidos_cell.alignment = Alignment(horizontal='center')
 
             current_date = datetime.now()
-            # Guardar el libro de trabajo en una respuesta HTTP
+            
             response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
             response['Content-Disposition'] = f'attachment; filename=reporte_ventas_anual_{current_date.strftime("%Y%m%d_%H%M%S")}.xlsx'
 
@@ -263,15 +263,15 @@ class GenerateExcelSalesMonthView(View):
                     'total_items_sold': sum(products_list.values())
                 })
 
-            # Crear un libro de trabajo de Excel
+            
             wb = Workbook()
             ws = wb.active
             ws.append([f"Reporte de Ventas: de {month_name} del {year}"])
-            # Agregar encabezados
+            
             headers = ['Cliente', 'Fecha', 'Productos', 'Total', 'Cantidad Total de Ítems']
             ws.append([''] + headers)
 
-            # Agregar datos de ventas
+            
             for sale in sale_details:
                 products_list = sale['products_list']
                 total_items_sold = sale['total_items_sold']
@@ -286,11 +286,11 @@ class GenerateExcelSalesMonthView(View):
                 ]
                 ws.append(sale_data)
 
-            # Agregar fila para los totales
+            
             total_row = ['Total General:', total_clientes, '', '', total_ingresos, total_items_vendidos]
             ws.append(total_row)
 
-            # Ajustar alineación de celdas
+            
             for row in ws.iter_rows(min_row=1, max_row=ws.max_row):
                 for cell in row:
                     if cell.column in [2, 3, 4]:
@@ -365,17 +365,17 @@ class GenerateExcelSalesDayView(View):
                     'total_items_sold': sum(products_list.values())
                 })
 
-            # Crear un libro de trabajo de Excel
+            
             wb = Workbook()
             ws = wb.active
 
             ws.append([f"Reporte de Ventas - Día: {day} de {month_name} del {year}"])
             
-            # Agregar encabezados
+            
             headers = ['Cliente', 'Fecha', 'Productos', 'Total', 'Cantidad Total de Ítems']
             ws.append(['']+ headers)
 
-            # Agregar datos de ventas
+            
             for sale in sale_details:
                 products_list = sale['products_list']
                 sale_data = [
@@ -388,11 +388,11 @@ class GenerateExcelSalesDayView(View):
                 ]
                 ws.append(sale_data)
 
-            # Agregar fila para los totales
+            
             total_row = ['Total General:', total_clientes, '','', total_ingresos, total_items_vendidos]
             ws.append(total_row)
 
-            # Ajustar alineación de celdas
+            
             for row in ws.iter_rows(min_row=1, max_row=ws.max_row):
                 for cell in row:
                     cell.alignment = Alignment(horizontal='center')

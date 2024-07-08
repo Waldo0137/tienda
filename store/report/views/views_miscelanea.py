@@ -1,4 +1,4 @@
-from purchase.models import *  # Importa el modelo PurchaseProduct
+from purchase.models import * 
 from pos.models import *
 from inventory.models import *
 from report.forms import *
@@ -41,8 +41,7 @@ class SupplierPDFView(View):
     def get(self, request, *args, **kwargs):
         suppliers = Supplier.objects.all()
 
-        # Renderizar el template HTML
-        template = get_template('report/mix_suppliers_pdf.html')  # Ajusta el nombre del template según tu estructura
+        template = get_template('report/mix_suppliers_pdf.html') 
         context = {
             'suppliers': suppliers,
             'current_date': timezone.now(),
@@ -77,14 +76,14 @@ class SupplierProductPDFView(View):
         html = template.render(context)
         
         current_date = datetime.now()
-        # Convertir HTML a PDF
+        
         pdf_file = BytesIO()
         pisa_status = pisa.CreatePDF(html, dest=pdf_file)
 
         if pisa_status.err:
             return HttpResponse('Error al generar el PDF')
 
-        # Configurar la respuesta HTTP con el PDF generado
+        
         pdf_file.seek(0)
         filename = f"lista_proveedores_productos_{current_date.strftime('%Y%m%d_%H%M%S')}.pdf"
         response = HttpResponse(pdf_file, content_type='application/pdf')
@@ -98,8 +97,8 @@ class ProductPDFView(View):
     def get(self, request, *args, **kwargs):
         products = Products.objects.all().order_by('name')
 
-        # Renderizar el template HTML
-        template = get_template('report/mix_products_pdf.html')  # Ajusta el nombre del template según tu estructura
+
+        template = get_template('report/mix_products_pdf.html')  
         context = {
             'products': products,
             'current_date': timezone.now(),
@@ -114,7 +113,7 @@ class ProductPDFView(View):
         if pisa_status.err:
             return HttpResponse('Error al generar el PDF')
 
-        # Configurar la respuesta HTTP con el PDF generado
+        
         pdf_file.seek(0)
         filename = f"lista_productos_{current_date.strftime('%Y%m%d_%H%M%S')}.pdf"
         response = HttpResponse(pdf_file, content_type='application/pdf')
@@ -126,8 +125,8 @@ class ProductPDFQtyView(View):
     def get(self, request, *args, **kwargs):
         products = Products.objects.all().order_by('name')
 
-        # Renderizar el template HTML
-        template = get_template('report/mix_productsqty_pdf.html')  # Ajusta el nombre del template según tu estructura
+        
+        template = get_template('report/mix_productsqty_pdf.html') 
         context = {
             'products': products,
             'current_date': timezone.now(),
@@ -135,14 +134,14 @@ class ProductPDFQtyView(View):
         html = template.render(context)
 
         current_date = datetime.now()
-        # Convertir HTML a PDF
+        
         pdf_file = BytesIO()
         pisa_status = pisa.CreatePDF(html, dest=pdf_file)
 
         if pisa_status.err:
             return HttpResponse('Error al generar el PDF')
 
-        # Configurar la respuesta HTTP con el PDF generado
+        
         pdf_file.seek(0)
         filename = f"lista_productos_detalles_{current_date.strftime('%Y%m%d_%H%M%S')}.pdf"
         response = HttpResponse(pdf_file, content_type='application/pdf')
@@ -160,7 +159,7 @@ class MixPDFSalesDayView(FormView):
         month = int(form.cleaned_data['month'])
         day = int(form.cleaned_data['day'])
 
-        # Definir el rango de fechas desde las 3 AM del día especificado
+        
         start_date = datetime(year, month, day, 3, 0, 0)
         end_date = start_date + timedelta(days=1)
 
@@ -168,12 +167,12 @@ class MixPDFSalesDayView(FormView):
         
         day_name_english = start_date.strftime('%A')  
         day_name = DAYS_OF_WEEK[day_name_english]  
-        # Validar la fecha
+        
         if not self.is_valid_day(year, month, day):
             messages.error(self.request, "La fecha ingresada no es válida.")
             return self.form_invalid(form)
 
-        # Filtrar ventas dentro del rango de fechas
+        
         sales = Sales.objects.filter(date_added__gte=start_date, date_added__lt=end_date)
         total_clientes = sales.values('id').distinct().count()
         total_items_vendidos = salesItems.objects.filter(sale__in=sales).aggregate(total=Sum('qty'))['total']
@@ -258,17 +257,17 @@ class MixTramoPDFSalesDayView(FormView):
         end_month = int(form.cleaned_data['end_month'])
         end_day = int(form.cleaned_data['end_day'])
 
-        # Validar que la fecha de inicio no sea mayor que la fecha fin
+        
         if not self.is_valid_date_range(start_year, start_month, start_day, end_year, end_month, end_day):
             messages.error(self.request, "La fecha de inicio no puede ser mayor que la fecha de fin.")
             return self.form_invalid(form)
 
-        # Definir el rango de fechas desde las 3 AM de la fecha de inicio
+        
         start_date = datetime(start_year, start_month, start_day, 3, 0, 0)
         end_date = datetime(end_year, end_month, end_day, 3, 0, 0) + timedelta(days=1)
         
         end_date_display = datetime(end_year, end_month, end_day)
-        # Validar la fecha de inicio y fin
+        
         if not self.is_valid_day(start_year, start_month, start_day) or not self.is_valid_day(end_year, end_month, end_day):
             messages.error(self.request, "Una de las fechas ingresadas no es válida.")
             return self.form_invalid(form)
@@ -276,7 +275,7 @@ class MixTramoPDFSalesDayView(FormView):
         day_name_start = DAYS_OF_WEEK[day_name_start_english]
         day_name_end_english = end_date_display.strftime('%A')
         day_name_end = DAYS_OF_WEEK[day_name_end_english]  
-        # Filtrar ventas dentro del rango de fechas
+        
         sales = Sales.objects.filter(date_added__gte=start_date, date_added__lt=end_date)
         total_clientes = sales.values('id').distinct().count()
         total_items_vendidos = salesItems.objects.filter(sale__in=sales).aggregate(total=Sum('qty'))['total']

@@ -10,7 +10,7 @@ from django.db.models import Sum
 from xhtml2pdf import pisa
 import datetime
 import uuid
-import io# Constantes globales
+import io
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 MONTH_NAMES = [
     "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -18,18 +18,13 @@ MONTH_NAMES = [
 ]
 
 
-# Funciones auxiliares
 def is_leap_year(year):
-    """
-    Función para verificar si un año es bisiesto.
-    """
+    
     return year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
 
 
 def is_valid_day(year, month, day):
-    """
-    Función para verificar si el día es válido para el mes y el año dados.
-    """
+    
     if month in [4, 6, 9, 11]:
         return day <= 30
     elif month == 2:
@@ -74,7 +69,7 @@ class PurchaseReportView(LoginRequiredMixin, PermissionRequiredMixin,ListView):
 
         queryset = self.get_queryset()
 
-        # Agrupar por proveedor y fecha
+        
         grouped_data = {}
         for item in queryset:
             key = (item.supplier, item.date_added.date())
@@ -100,7 +95,7 @@ class PurchaseReportView(LoginRequiredMixin, PermissionRequiredMixin,ListView):
             grouped_data[key]['total'] += item.total
             grouped_data[key]['total_items_bought'] += item.qty
 
-        # Preparar los datos de compras para la tabla
+        
         purchase_data = []
         for key, data in grouped_data.items():
             purchase_data.append({
@@ -111,7 +106,7 @@ class PurchaseReportView(LoginRequiredMixin, PermissionRequiredMixin,ListView):
                 'total_items_bought': data['total_items_bought'],
             })
 
-        # Agregar los cálculos al contexto
+        
         total_suppliers = queryset.values('supplier').distinct().count()
         total_items_comprados = queryset.aggregate(total=Sum('qty'))['total']
         total_costos = queryset.aggregate(total=Sum('total'))['total']
@@ -130,7 +125,7 @@ class PurchaseReportView(LoginRequiredMixin, PermissionRequiredMixin,ListView):
 
 class GeneratePDFPurchaseView(View):
     def get(self, request, *args, **kwargs):
-        user = request.user  # Obtiene el usuario autenticado
+        user = request.user  
 
         form = YearReportForm(request.GET)
         if form.is_valid():
@@ -150,7 +145,7 @@ class GeneratePDFPurchaseView(View):
         for purchase in purchase_data:
             items = PurchaseProduct.objects.filter(id=purchase.id)
             products_list = {}
-            total_items = 0  # Initialize the total items count for this purchase
+            total_items = 0  
 
             for item in items:
                 product_name = item.product.name
@@ -159,40 +154,40 @@ class GeneratePDFPurchaseView(View):
                 else:
                     products_list[product_name] = item.cost
                 total_items_comprados += item.qty
-                total_items += item.qty  # Add item quantity to total items for this purchase
+                total_items += item.qty  
 
             purchase_details.append({
                 'supplier': purchase.supplier,
                 'date_added': purchase.date_added,
                 'products_list': products_list,
                 'grand_total': purchase.total,
-                'total_items_bought': total_items  # Use the total items count for this purchase
+                'total_items_bought': total_items  
             })
 
         current_date = datetime.datetime.now()
         unique_key = str(uuid.uuid4())
 
-        # Renderiza el HTML de la plantilla con los datos
+        
         html_string = render_to_string('report/purchase_pdf.html', {
             'purchase_data': purchase_details,
             'total_suppliers': total_suppliers,
             'total_items_comprados': total_items_comprados,
             'total_costos': total_costos,
             'current_date': current_date,
-            'username': user.username,  # Añade el nombre del usuario al contexto
-            'unique_key': unique_key,  # Añade la clave única al contexto
+            'username': user.username,  
+            'unique_key': unique_key,  
         })
 
-        # Crear una respuesta HTTP con el PDF
+        
         pdf_buffer = io.BytesIO()
         pisa_status = pisa.CreatePDF(
             io.BytesIO(html_string.encode("UTF-8")), dest=pdf_buffer, encoding='UTF-8')
 
-        # Si hay errores, muestra una cadena de errores en el PDF
+        
         if pisa_status.err:
             return HttpResponse('We had some errors <pre>' + html_string + '</pre>')
 
-        # Generar nombre del archivo con fecha y hora
+        
         filename = f"reporte_compras_general_{current_date.strftime('%Y%m%d_%H%M%S')}.pdf"
 
         response = HttpResponse(content_type='application/pdf')
@@ -205,26 +200,24 @@ class GeneratePDFPurchaseView(View):
 
 
 class YearlyPDFPurchaseView(FormView):
-    form_class = YearReportForm  # Asegúrate de tener definido tu formulario YearReportForm
-    template_name = 'report/purchase_pdf_year.html'  # Asegúrate de que la ruta sea correcta
+    form_class = YearReportForm
+    template_name = 'report/purchase_pdf_year.html'  
 
     def form_valid(self, form):
         year = form.cleaned_data['year']
-        # Filtrar las compras por año y obtener los totales directamente
+        
         purchases = PurchaseProduct.objects.filter(date_added__year=year)
         total_suppliers = purchases.values('supplier').distinct().count()
         total_items_comprados = purchases.aggregate(total=Sum('qty'))['total']
         total_costos = purchases.aggregate(total=Sum('total'))['total']
 
-        # Detalles de las compras para el informe
+        
         purchase_details = []
         for purchase in purchases:
             items = PurchaseProduct.objects.filter(id=purchase.id)
             total_items = 0 
             products_list = {}
             for item in items:
-                # product_name = item.product.name
-                # products_list[product_name] = products_list.get(product_name, 0) + item.qty
                 
                 product_name = item.product.name
                 if product_name in products_list:
@@ -241,7 +234,6 @@ class YearlyPDFPurchaseView(FormView):
                 'total_items_bought': total_items
             })
 
-        # Generación del PDF usando xhtml2pdf
         current_date = timezone.now()
         unique_key = str(uuid.uuid4())
         html_string = render_to_string('report/purchase_pdf_year.html', {
@@ -271,8 +263,8 @@ class YearlyPDFPurchaseView(FormView):
 
 
 class MonthlyPDFPurchaseView(FormView):
-    form_class = MonthYearReportForm  # Asegúrate de tener definido tu formulario MonthYearReportForm
-    template_name = 'report/purchase_pdf_month.html'  # Asegúrate de que la ruta sea correcta
+    form_class = MonthYearReportForm
+    template_name = 'report/purchase_pdf_month.html'  
 
     def form_valid(self, form):
         year = form.cleaned_data['year']
@@ -284,13 +276,13 @@ class MonthlyPDFPurchaseView(FormView):
         except ValueError:
             return HttpResponseBadRequest("El año o el mes proporcionados no son válidos.")
 
-        # Filtrar las compras por mes y año y obtener los totales directamente
+        
         purchases = PurchaseProduct.objects.filter(date_added__year=year, date_added__month=month)
         total_suppliers = purchases.values('supplier').distinct().count()
         total_items_comprados = purchases.aggregate(total=Sum('qty'))['total']
         total_costos = purchases.aggregate(total=Sum('total'))['total']
 
-        # Detalles de las compras para el informe
+        
         purchase_details = []
         for purchase in purchases:
             items = PurchaseProduct.objects.filter(id=purchase.id)
@@ -312,7 +304,7 @@ class MonthlyPDFPurchaseView(FormView):
                 'total_items_bought': total_items
             })
 
-        # Generación del PDF usando xhtml2pdf
+        
         current_date = timezone.now()
         unique_key = str(uuid.uuid4())
         html_string = render_to_string('report/purchase_pdf_month.html', {
@@ -344,8 +336,8 @@ class MonthlyPDFPurchaseView(FormView):
 
 
 class DailyPDFPurchaseView(FormView):
-    form_class = DayMonthYearReportForm  # Asegúrate de tener definido tu formulario DayMonthYearReportForm
-    template_name = 'report/purchase_pdf_day.html'  # Asegúrate de que la ruta sea correcta
+    form_class = DayMonthYearReportForm  
+    template_name = 'report/purchase_pdf_day.html'  
 
     def form_valid(self, form):
         year = form.cleaned_data['year']
@@ -358,13 +350,13 @@ class DailyPDFPurchaseView(FormView):
             messages.error(self.request, "La fecha ingresada no es válida.")
             return self.form_invalid(form)
         
-        # Filtrar las compras por año, mes y día y obtener los totales directamente
+        
         purchases = PurchaseProduct.objects.filter(date_added__year=year, date_added__month=month, date_added__day=day)
         total_suppliers = purchases.values('supplier').distinct().count()
         total_items_comprados = purchases.aggregate(total=Sum('qty'))['total']
         total_costos = purchases.aggregate(total=Sum('total'))['total']
 
-        # Detalles de las compras para el informe
+        
         purchase_details = []
         for purchase in purchases:
             items = PurchaseProduct.objects.filter(id=purchase.id)
@@ -386,7 +378,7 @@ class DailyPDFPurchaseView(FormView):
                 'total_items_bought': total_items
             })
 
-        # Generación del PDF usando xhtml2pdf
+        
         current_date = timezone.now()
         unique_key = str(uuid.uuid4())
         html_string = render_to_string('report/purchase_pdf_day.html', {

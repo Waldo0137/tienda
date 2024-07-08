@@ -39,60 +39,59 @@ class GenerateExcelPurchaseView(View):
     def post(self, request, *args, **kwargs):
         form = ReportForm(request.POST)
         if form.is_valid():
-            # Filtrar todas las compras
             purchase_products = PurchaseProduct.objects.all()
 
-            # Calcular el conteo general de proveedores
+            
             total_suppliers = purchase_products.values('supplier').distinct().count()
 
-            # Calcular la cantidad total de ítems comprados
+            
             total_items_comprados = purchase_products.aggregate(total=Sum('qty'))['total']
 
-            # Calcular la cantidad total de costos
+            
             total_costos = purchase_products.aggregate(total=Sum('total'))['total']
 
-            # Crear un libro de trabajo de Excel
+            
             wb = Workbook()
             ws = wb.active
 
-            # Agregar encabezados
+            
             headers = ['Proveedor', 'Fecha', 'Productos', 'Total', 'Cantidad Total de Ítems']
             ws.append([''] + headers)
 
-            # Agregar datos de compras
+            
             for purchase_product in purchase_products:
                 products_list = {purchase_product.product.name: purchase_product.qty}
                 total_items_bought = sum(products_list.values())
 
-                # Formatear los datos según sea necesario
+            
                 purchase_data = [
                     '',
-                    str(purchase_product.supplier),  # Convertir el proveedor a cadena
-                    purchase_product.date_added.strftime('%Y-%m-%d %H:%M'),  # Formato de fecha personalizado
-                    ', '.join([f"{product}: {quantity}" for product, quantity in products_list.items()]),  # Lista de productos como cadena
+                    str(purchase_product.supplier),  
+                    purchase_product.date_added.strftime('%Y-%m-%d %H:%M'),  
+                    ', '.join([f"{product}: {quantity}" for product, quantity in products_list.items()]),
                     purchase_product.total,
                     total_items_bought
                 ]
 
                 ws.append(purchase_data)
 
-            # Agregar fila para los totales
+            
             total_row = ['Total General:', total_suppliers, '', '', total_costos, total_items_comprados]
             ws.append(total_row)
 
-            # Ajustar alineación de celdas
+            
             for row in ws.iter_rows(min_row=1, max_row=ws.max_row):
                 for cell in row:
-                    if cell.column in [2, 3, 4]:  # Alinear a la izquierda las columnas Proveedor, Fecha, Productos
+                    if cell.column in [2, 3, 4]:
                         cell.alignment = Alignment(horizontal='left')
-                    elif cell.column in [5, 6, 7]:  # Alinear a la derecha las columnas Total, Cantidad Total de Ítems
+                    elif cell.column in [5, 6, 7]:
                         cell.alignment = Alignment(horizontal='right')
 
-            # Alinear la celda "Total General:" a la izquierda
+            
             total_general_cell = ws['A' + str(ws.max_row)]
             total_general_cell.alignment = Alignment(horizontal='left')
 
-            # Alinear los totales a la derecha
+            
             total_suppliers_cell = ws['B' + str(ws.max_row)]
             total_suppliers_cell.alignment = Alignment(horizontal='right')
 
@@ -103,7 +102,7 @@ class GenerateExcelPurchaseView(View):
             total_items_comprados_cell.alignment = Alignment(horizontal='right')
 
             current_date = datetime.now()
-            # Guardar el libro de trabajo en una respuesta HTTP
+            
             response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
             response['Content-Disposition'] = f'attachment; filename=reporte_compras_general_{current_date.strftime("%Y%m%d_%H%M%S")}.xlsx'
 
@@ -121,7 +120,7 @@ class ExcelPurchaseYearView(FormView):
     def form_valid(self, form):
         year = form.cleaned_data['year']
 
-        # Filtrar las compras por año
+        
         purchase_products = PurchaseProduct.objects.filter(date_added__year=year)
 
         total_suppliers = purchase_products.values('supplier').distinct().count()
@@ -192,7 +191,7 @@ class ExcelPurchaseMonthView(FormView):
         except IndexError:
             return HttpResponseBadRequest("El mes proporcionado no es válido.")
 
-        # Filtrar las compras por año y mes
+        
         purchase_products = PurchaseProduct.objects.filter(date_added__year=year, date_added__month=month)
 
         total_suppliers = purchase_products.values('supplier').distinct().count()
@@ -269,7 +268,7 @@ class ExcelPurchaseDayView(FormView):
             messages.error(self.request, "La fecha ingresada no es válida.")
             return HttpResponseBadRequest("La fecha ingresada no es válida.")
 
-        # Filtrar las compras por año, mes y día
+        
         purchase_products = PurchaseProduct.objects.filter(date_added__year=year, date_added__month=month, date_added__day=day)
 
         total_suppliers = purchase_products.values('supplier').distinct().count()

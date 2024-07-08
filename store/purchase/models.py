@@ -38,19 +38,10 @@ class PurchaseProduct(models.Model):
         self.clean()
         self.total = self.cost * self.qty
         
-        # with transaction.atomic():
-        #     # Guardar el objeto PurchaseProduct
-        #     super().save(*args, **kwargs)
-        #     # Actualizar el producto asociado
-        #     if self.product:
-        #         self.product.update_cost(self.cost)
-        #         self.product.increase_quantity(self.qty)
-
-        # nueva1
         with transaction.atomic():
-            # Guardar el objeto PurchaseProduct
+            
             if self.pk:
-                # Obtenemos la instancia anterior antes de guardar los cambios
+            
                 previous_instance = PurchaseProduct.objects.get(pk=self.pk)
                 quantity_difference = self.qty - previous_instance.qty
             else:

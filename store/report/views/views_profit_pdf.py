@@ -108,7 +108,7 @@ class ProfitReportView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
                     'ganancia': sale_profit,
                 })
 
-                # Añadir entrada de compra si existe
+
                 if purchase_product:
                     sales_data.append({
                         'date_added': purchase_product.date_added,
@@ -121,7 +121,7 @@ class ProfitReportView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
                         'ganancia': -qty_comprada * cost_per_unit,
                     })
 
-        # Ordenar los datos por fecha y hora
+
         sales_data.sort(key=lambda x: x['date_added'])
 
         return sales_data
@@ -148,7 +148,7 @@ class GeneratePDFProfitView(View):
         total_costos_decimal = Decimal(total_costos)
         total_ganancia = total_ingresos_decimal - total_costos_decimal
 
-        # sales_data   = self.get_sales_data(sales_queryset)
+
         sales_data, total_utilidades = self.get_sales_data_and_utilities(sales_queryset)
 
         current_date = datetime.now()
@@ -206,8 +206,6 @@ class GeneratePDFProfitView(View):
 
         return total_costos
 
-    # def get_sales_data(self, sales_queryset):
-    #     sales_data = []
     
     def get_sales_data_and_utilities(self, sales_queryset):
         sales_data = []
@@ -288,16 +286,14 @@ class YearlyPDFProfitView(FormView):
         total_costos_decimal = Decimal(total_costos)
         total_ganancia = total_ingresos_decimal - total_costos_decimal
 
-        # Obtener detalles de ventas para el informe
-        # sales_data = self.get_sales_data(sales_queryset)
         sales_data, total_utilidades = self.get_sales_data_and_utilities(sales_queryset)
 
-        # Datos adicionales para el contexto del PDF
+
         current_date = timezone.now()
         username = self.request.user.username
         unique_key = uuid.uuid4()
 
-        # Contexto para el template del PDF
+    
         context = {
             'sales_data': sales_data,
             'total_ingresos': total_ingresos,
@@ -310,10 +306,10 @@ class YearlyPDFProfitView(FormView):
             'year': year,
         }
 
-        # Renderizar el template a HTML
+    
         html_string = render_to_string(self.template_name, context)
 
-        # Generar el PDF usando xhtml2pdf
+    
         pdf_file = io.BytesIO()
         pisa_status = pisa.CreatePDF(io.BytesIO(html_string.encode("UTF-8")), dest=pdf_file, encoding='UTF-8')
 
@@ -322,7 +318,7 @@ class YearlyPDFProfitView(FormView):
 
         pdf_file.seek(0)
 
-        # Preparar la respuesta HTTP con el PDF generado
+    
         response = HttpResponse(pdf_file, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="reporte_ganancias_anual_{current_date.strftime("%Y%m%d_%H%M%S")}.pdf"'
 
@@ -354,13 +350,13 @@ class YearlyPDFProfitView(FormView):
                     total_qty_vendida = item.qty
                     total_gasto_compras = cost_per_unit * total_qty_comprada
                     
-                    # Calcular ganancia por producto
+    
                     product_ganancia = Decimal(sale.grand_total) - (cost_per_unit * total_qty_vendida)
                     
-                    # Calcular el costo total
+    
                     costo_total = self.calculate_sale_cost(sale)
 
-                    # Calcular ganancia bruta
+    
                     ganancia_bruta = (costo_total + product_ganancia) - total_gasto_compras
                     total_utilidades += ganancia_bruta
                     products_list.append({
@@ -411,24 +407,24 @@ class MonthlyPDFProfitView(FormView):
         except ValueError:
             return HttpResponseBadRequest("El año o el mes proporcionados no son válidos.")
 
-        # Obtener las ventas filtradas por año y mes
+    
         sales_queryset = Sales.objects.filter(date_added__year=year, date_added__month=month)
 
-        # Calcular totales
+
         total_ingresos = sales_queryset.aggregate(total=Sum('grand_total'))['total'] or 0
         total_costos = self.calculate_total_costos(sales_queryset)
         total_ingresos_decimal = Decimal(total_ingresos)
         total_costos_decimal = Decimal(total_costos)
         total_ganancia = total_ingresos_decimal - total_costos_decimal
 
-        # Obtener detalles de ventas para el informe
+
         sales_data, total_utilidades = self.get_sales_data_and_utilities(sales_queryset)
-        # Datos adicionales para el contexto del PDF
+
         current_date = timezone.now()
         username = self.request.user.username
         unique_key = uuid.uuid4()
 
-        # Contexto para el template del PDF
+
         context = {
             'sales_data': sales_data,
             'total_ingresos': total_ingresos,
@@ -442,10 +438,10 @@ class MonthlyPDFProfitView(FormView):
             'month': month_name,
         }
 
-        # Renderizar el template a HTML
+    
         html_string = render_to_string(self.template_name, context)
 
-        # Generar el PDF usando xhtml2pdf
+    
         pdf_file = io.BytesIO()
         pisa_status = pisa.CreatePDF(io.BytesIO(html_string.encode("UTF-8")), dest=pdf_file, encoding='UTF-8')
 
@@ -454,7 +450,7 @@ class MonthlyPDFProfitView(FormView):
 
         pdf_file.seek(0)
 
-        # Preparar la respuesta HTTP con el PDF generado
+    
         response = HttpResponse(pdf_file, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="reporte_ganancias_mensual_{current_date.strftime("%Y%m%d_%H%M%S")}.pdf"'
 
@@ -487,13 +483,13 @@ class MonthlyPDFProfitView(FormView):
                     total_qty_vendida = item.qty
                     total_gasto_compras = cost_per_unit * total_qty_comprada
                     
-                    # Calcular ganancia por producto
+                
                     product_ganancia = Decimal(sale.grand_total) - (cost_per_unit * total_qty_vendida)
                     
-                    # Calcular el costo total
+                
                     costo_total = self.calculate_sale_cost(sale)
 
-                    # Calcular ganancia bruta
+                
                     ganancia_bruta = (costo_total + product_ganancia) - total_gasto_compras
 
                     total_utilidades += ganancia_bruta 
@@ -546,10 +542,10 @@ class DailyPDFProfitView(FormView):
         except ValueError:
             return HttpResponseBadRequest("El año o el mes proporcionados no son válidos.")
 
-        # Obtener las ventas filtradas por año, mes y día
+        
         sales_queryset = Sales.objects.filter(date_added__year=year, date_added__month=month, date_added__day=day)
 
-        # Calcular totales
+        
         total_ingresos = sales_queryset.aggregate(total=Sum('grand_total'))['total'] or 0
         total_costos = self.calculate_total_costos(sales_queryset)
         total_ingresos_decimal = Decimal(total_ingresos)
@@ -557,15 +553,15 @@ class DailyPDFProfitView(FormView):
         total_ganancia = total_ingresos_decimal - total_costos_decimal
 
 
-        # Obtener detalles de ventas para el informe y calcular total_utilidades
+        
         sales_data, total_utilidades = self.get_sales_data_and_utilities(sales_queryset)
 
-        # Datos adicionales para el contexto del PDF
+        
         current_date = timezone.now()
         username = self.request.user.username
         unique_key = uuid.uuid4()
 
-        # Contexto para el template del PDF
+        
         context = {
             'sales_data': sales_data,
             'total_ingresos': total_ingresos,
@@ -580,10 +576,10 @@ class DailyPDFProfitView(FormView):
             'day': day,
         }
 
-        # Renderizar el template a HTML
+    
         html_string = render_to_string(self.template_name, context)
 
-        # Generar el PDF usando xhtml2pdf
+    
         pdf_file = io.BytesIO()
         pisa_status = pisa.CreatePDF(io.BytesIO(html_string.encode("UTF-8")), dest=pdf_file, encoding='UTF-8')
 
@@ -592,7 +588,7 @@ class DailyPDFProfitView(FormView):
 
         pdf_file.seek(0)
 
-        # Preparar la respuesta HTTP con el PDF generado
+    
         response = HttpResponse(pdf_file, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="reporte_ganancias_diaria_{current_date.strftime("%Y%m%d_%H%M%S")}.pdf"'
 
@@ -624,16 +620,16 @@ class DailyPDFProfitView(FormView):
                     total_qty_vendida = item.qty
                     total_gasto_compras = cost_per_unit * total_qty_comprada
                     
-                    # Calcular ganancia por producto
+    
                     product_ganancia = Decimal(sale.grand_total) - (cost_per_unit * total_qty_vendida)
                     
-                    # Calcular el costo total
+    
                     costo_total = self.calculate_sale_cost(sale)
 
-                    # Calcular ganancia bruta
+    
                     ganancia_bruta = (costo_total + product_ganancia) - total_gasto_compras
 
-                    total_utilidades += ganancia_bruta  # Sumar ganancia por producto a total_utilidades
+                    total_utilidades += ganancia_bruta  
 
                     products_list.append({
                         'product_name': item.product.name,

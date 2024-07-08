@@ -19,7 +19,7 @@ class SupplierForm(forms.ModelForm):
             'contact_info': forms.Textarea(attrs={
                 'class': 'form-control',
                 'placeholder': 'Ingrese información:\n Dirección\n Teléfono\n Rubro\n Etc',
-                'rows': 6,  # Ajusta aquí el número de filas, 3 filas más que el valor por defecto de 3
+                'rows': 6,  
             }),
         }
         error_messages = {
