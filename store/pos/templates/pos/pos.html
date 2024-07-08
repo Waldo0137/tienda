@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+{% load static %}
+{% block pageContent %}
+<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
+    <div class="mdc-card py-2">
+        <div class="d-flex justify-content-between align-items-center">
+            <h4 class="card-title mb-0">Punto de Venta</h4>
+        </div>
+    </div>
+</div>
+<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
+    <div class="mdc-card">
+        <form action="" id="pos-form">
+            <fieldset>
+                <legend>Agregar Producto </legend>
+                <div class="row align-items-end">
+                    <div class="col-lg-5 col-md-5 col-sm-12">
+                        <div class="form-group mb-3">
+                            <label for="product-id">Selecccione Producto</label>
+                            <select id="product-id" class="form-select form-select-sm">
+                                <option value="" disabled selected></option>
+                                {% for product in products %}
+                                    <option value="{{ product.pk }}">{{ product }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-5 col-md-12">
+                        <div class="form-group mb-3">
+                            <label for="product-qty">Cantidad</label>
+                            <input type="number" class="form-control form-control-sm text-center" step="any" id="product-qty" value="1">
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-2 col-md-12">
+                        <div class="form-group mb-3">
+                            <button class="btn btn-light btn-sm bg-gradient border rounded-0 text-start" type="button" id="add_item"><i class="mdi mdi-plus"></i> Añadir</button>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            <fieldset>
+                <div class="d-flex w-100" id="POS-field">
+                    <div class="col-8 bg-gradient bg-light border h-100">
+                        <table class="table table-bordered">
+                            <colgroup>
+                                <col width="5%">
+                                <col width="15%">
+                                <col width="40%">
+                                <col width="20%">
+                                <col width="20%">
+                            </colgroup>
+                            <thead>
+                                <tr class="bg-dark bg-gradient bg-opacity-50 text-light">
+                                    <th class="py-1 px-2 text-center text-light"></th>
+                                    <th class="py-1 px-2 text-center text-light">Cantidad</th>
+                                    <th class="py-1 px-2 text-center text-light">Producto</th>
+                                    <th class="py-1 px-2 text-center text-light">Precio</th>
+                                    <th class="py-1 px-2 text-center text-light">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-4 bg-gradient bg-dark bg-opacity-50 border h-100">
+                        <div class="col-12 py-4 px-2">
+                            <dl>
+                                <dt class="h4 fw-bold text-light">Sub Total</dt>
+                                <dd class="text-end py-1 px-2 rounded-0 bg-light">
+                                    <input type="hidden" name="sub_total" value="0">
+                                    <span class="h3 fw-bold" id="sub_total">0.00</span>
+                                </dd>
+                                <dt class="h4 fw-bold text-light " >Tax Inclusive (%)</dt>
+                                <dd>
+                                    <input type="number" class="form-control form-control-lg rounded-0 text-end" step="any" min="0" max="100" name="tax" value="0" readonly>
+                                </dd>
+                                <dt class="h4 fw-bold text-light">Tax Amount</dt>
+                                <dd class="text-end py-1 px-2 rounded-0 bg-light">
+                                    <input type="hidden" name="tax_amount" value="0">
+                                    <span class="h3 fw-bold" id="tax_amount">0.00</span>
+                                </dd>
+                                <dt class="h4 fw-bold text-light">Total General</dt>
+                                <dd class="text-end py-1 px-2 rounded-0 bg-light">
+                                    <input type="hidden" name="grand_total" value="0">
+                                    <input type="hidden" name="tendered_amount" value="0">
+                                    <input type="hidden" name="amount_change" value="0">
+                                    <span class="h3 fw-bold" id="grand_total">0.00</span>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            <div class="row">
+                <div class="col-md-12 text-end">
+                    <button class="btn btn-primary btn-sm rounded-0" type="button" id="check_out"><i class="mdi mdi-save"></i> Procesar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<noscript id="item-clone">
+    <tr>
+        <td class="px-2 py-1 text-center">
+            <button class="btn btn-sm btn-outline-danger rounded-0 rem-item" type="button"><i class="mdi mdi-close"></i></button>
+        </td>
+        <td class="px-2 py-1">
+            <input type="hidden" name="product[]">
+            <input type="hidden" name="price[]">
+            <input type="number" name="qty[]" min="0" class="form-control form-control-sm rounded-0 text-center">
+        </td>
+        <td class="px-2 py-1 product_name text-start"></td>
+        <td class="px-2 py-1 product_price text-end"></td>
+        <td class="px-2 py-1 product_total text-end"></td>
+    </tr>
+</noscript>
+{% endblock pageContent %}
+
+{% block ScriptBlock %}
+<script>
+    var product_json = '{{ product_json }}';
+    if (product_json == "" || product_json == "{}") {
+        product_json = {};
+    } else {
+        product_json = product_json.replaceAll('&quot;', '"');
+        product_json = $.parseJSON(product_json);
+    }
+
+    var prod_arr = {};
+    if (Object.keys(product_json).length > 0) {
+        Object.keys(product_json).map(k => {
+            prod_arr[product_json[k].id] = product_json[k];
+        });
+    }
+
+    function calc() {
+        var sub_total = 0;
+        var grand_total = 0;
+        $('#POS-field table tbody tr').each(function() {
+            var price = $(this).find('[name="price[]"]').val();
+            var qty = $(this).find('[name="qty[]"]').val();
+            qty = qty > 0 ? qty : 0;
+            var total = parseFloat(price) * parseFloat(qty);
+            $(this).find('.product_total').text(parseFloat(total).toLocaleString('en-US'));
+            sub_total += parseFloat(total);
+        });
+
+        var tax = $('[name="tax"]').val();
+        tax = tax / 100;
+        var tax_amount = parseFloat(sub_total) * parseFloat(tax);
+        $('#tax_amount').text(parseFloat(tax_amount).toLocaleString('en-US'));
+        $('[name="tax_amount"]').val(parseFloat(tax_amount));
+        $('#grand_total').text(parseFloat(sub_total).toLocaleString('en-US'));
+        $('[name="grand_total"]').val(parseFloat(sub_total));
+        $('#sub_total').text(parseFloat(sub_total).toLocaleString('en-US'));
+        $('[name="sub_total"]').val(parseFloat(sub_total));
+    }
+
+    $(function() {
+        $('#product-id').select2({
+            placeholder: "Por favor, Seleccione su Producto",
+            width: '100%'
+        });
+
+        $('#add_item').click(function() {
+            var id = $('#product-id').val();
+            var qty = $('#product-qty').val();
+            if (id == '' || qty == '' || id == null || qty == null) {
+                alert("Producto y Cantidad es requerido!");
+                return false;
+            }
+            if (!!prod_arr[id]) {
+                if ($('#POS-field table tbody input[name="product[]"][value="' + id + '"]').length > 0) {
+                    alert('El Item ya esta en la Lista.');
+                    return false;
+                }
+                var data = prod_arr[id];
+                var tr = $($('noscript#item-clone').html()).clone();
+                tr.find('[name="qty[]"]').val(qty);
+                tr.find('[name="product[]"]').val(id);
+                tr.find('[name="price[]"]').val(data.price);
+                tr.find('.product_name').text(data.name);
+                tr.find('.product_price').text(parseFloat(data.price).toLocaleString('en-US'));
+                tr.find('.product_total').text(parseFloat(data.price * qty).toLocaleString('en-US'));
+                $('#POS-field table tbody').append(tr);
+                $('#product-id').val('').trigger('change');
+                $('#product-qty').val(1);
+                calc();
+                tr.find('[name="qty[]"]').on('input keypress keyup keydown', function() {
+                    calc();
+                });
+                tr.find('.rem-item').click(function() {
+                    if (confirm("Esta seguro de remover " + data.name + " de la Lista?") == true) {
+                        tr.remove();
+                        calc();
+                    }
+                });
+            } else {
+                alert("Producto no definido");
+            }
+        });
+
+        $('[name="tax"]').on('input keypress keydown keyup', function() {
+            calc();
+        });
+
+        $('#check_out').click(function() {
+            if ($('#POS-field table tbody tr').length <= 0) {
+                alert("Primero, agregue al menos 1 producto!");
+                return false;
+            }
+            uni_modal("Verificar", "{% url 'pos:checkout-modal' %}?grand_total=" + $('[name="grand_total"]').val());
+        });
+
+        $('#pos-form').submit(function(e) {
+            e.preventDefault();
+            var _this = $(this);
+            $('.err-msg').remove();
+            var el = $('<div>');
+            el.addClass("alert alert-danger err-msg");
+            el.hide();
+            if (_this[0].checkValidity() == false) {
+                _this[0].reportValidity();
+                return false;
+            }
+            start_loader();
+            $.ajax({
+                headers: {
+                    "X-CSRFToken": '{{csrf_token}}'
+                },
+                url: "{% url 'pos:save-pos' %}",
+                data: new FormData($(this)[0]),
+                cache: false,
+                contentType: false,
+                processData: false,
+                method: 'POST',
+                type: 'POST',
+                dataType: 'json',
+                error: err => {
+                    console.log(err);
+                    end_loader();
+                },
+                success: function(resp) {
+                    if (typeof resp == 'object' && resp.status == 'success') {
+                        el.removeClass("alert alert-danger err-msg");
+                        uni_modal("Recibo", "{% url 'pos:receipt-modal' %}?id=" + resp.sale);
+                        $('#uni_modal').on('hide.bs.modal', function() {
+                            location.reload();
+                        });
+                    } else if (resp.status == 'failed' && !!resp.msg) {
+                        el.text(resp.msg);
+                    } else {
+                        el.text("An error occurred.");
+                        end_loader();
+                        console.error(resp);
+                    }
+                    _this.prepend(el);
+                    el.show('slow');
+                    $("html, body, .modal").scrollTop(0);
+                    end_loader();
+                }
+            });
+        });
+    });
+</script>
+{% endblock ScriptBlock %}

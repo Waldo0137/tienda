@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block pageContent %}
+<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
+    <div class="mdc-card py-2">
+        <div class="d-flex justify-content-between align-items-center">
+            <h4 class="card-title mb-0">Crear Compra</h4>
+        </div>
+    </div>
+</div>
+
+<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
+    <div class="mdc-card">
+        <div class="p-4">
+            <form method="post" class="purchase-form">
+                {% csrf_token %}
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label class="form-label" for="{{ form.product.id_for_label }}" style="color: #333;">{{ form.product.label }}</label>
+                        {{ form.product }}
+                        {% if form.product.errors %}
+                            <div class="text-danger" style="color: red;">
+                                {% for error in form.product.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="{{ form.supplier.id_for_label }}" style="color: #333;">{{ form.supplier.label }}</label>
+                        {{ form.supplier }}
+                        {% if form.supplier.errors %}
+                            <div class="text-danger" style="color: red;">
+                                {% for error in form.supplier.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <hr>
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label class="form-label" for="{{ form.cost.id_for_label }}" style="color: #333;">{{ form.cost.label }}</label>
+                        {{ form.cost }}
+                        {% if form.cost.errors %}
+                            <div class="text-danger" style="color: red;">
+                                {% for error in form.cost.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="{{ form.qty.id_for_label }}" style="color: #333;">{{ form.qty.label }}</label>
+                        {{ form.qty }}
+                        {% if form.qty.errors %}
+                            <div class="text-danger" style="color: red;">
+                                {% for error in form.qty.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <hr>
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label class="form-label" style="color: #333;">Fecha de Creación</label>
+                        <p style="color: #666;">{{ form.instance.date_added }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" style="color: #333;">Fecha de Actualización</label>
+                        <p style="color: #666;">{{ form.instance.date_updated }}</p>
+                    </div>
+                </div>
+                <hr>
+                <div class="form-group row mt-3">
+                    
+                    <div class="col-12 d-flex justify-content-end">
+                        
+                        <div class="btn-group">
+                            <a href="{% url 'purchase:purchase_list' %}" class="btn btn-secondary" style="background-color: #6c757d;">Volver a la lista de compras</a>
+                            <button type="submit" class="btn btn-success" style="background-color: #28a745;">Guardar</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            
+            {% if form.errors %}
+                <div class="text-danger mt-3">
+                    <ul>
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

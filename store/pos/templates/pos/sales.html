@@ -1,0 +1,106 @@
+{% extends "base.html" %} {% load humanize %} {% block pageContent %}
+<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
+    <div class="mdc-card py-2">
+        <div class="d-flex justify-content-between align-items-center">
+            <h4 class="card-title mb-0">Lista de Ventas</h4>
+        </div>
+    </div>
+</div>
+<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
+    <div class="mdc-card">
+        <div class="table-responsive">
+            <table id="miTabla" class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th class="text-center py-1">Clientes</th>
+                        <th class="text-center py-1">Fecha y Hora</th>
+                        <th class="text-center py-1">Productos</th>
+                        <th class="text-center py-1">Total</th>
+                        <th class="text-center py-1">Cantidad Total Items</th>
+                        <th class="text-center py-1">Accion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sale in sale_data %}
+                    <tr>
+                        <td class="px-2 py-1 text-center">{{ sale.cliente }}</td>
+                        <td class="px-2 py-1 text-center">{{ sale.date_added|date:'d-m-Y H:i' }}</td>
+                        <td class="px-2 py-1 text-rigth">
+                            {% if sale.products_list %}
+                                {% for product, quantity in sale.products_list.items %}
+                                    {{ product|capfirst }}  -  {{ quantity }}<br>
+                                {% endfor %}
+                            {% endif %}
+                        </td>
+                        <td class="px-2 py-1 text-center">{{ sale.grand_total|floatformat:2|intcomma }} Bs</td>
+
+                        <td class="px-2 py-1 text-center">{{ sale.total_items_sold }}</td>
+                        <td class="px-2 py-1 text-center">
+                            <button class="mdc-button mdc-button--raised p-1 icon-button filled-button--light mdc-ripple-upgraded view-data" type="button" data-id="{{ sale.id }}" title="Vista Recibo">
+                                <i class="material-icons mdc-button__icon">receipt</i>
+                            </button>
+                            <button class="mdc-button mdc-button--raised p-1 icon-button filled-button--danger mdc-ripple-upgraded delete-data" type="button" data-id="{{ sale.id }}" data-code="{{ sale.code }}" title="Eliminar">
+                                <i class="material-icons mdc-button__icon">deleteoutline</i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>{% endblock pageContent %} {% block ScriptBlock %}
+<script>
+    $(document).ready(function() {
+      $('#miTabla').DataTable({
+        "paging": true,
+        "ordering": true,
+        "searching": true,
+        "responsive": true,
+        "lengthChange": false,
+        "autoWidth": false,
+        "order": [[1, "desc"]], 
+        "buttons": ['copy', 'csv', 'excel', 'pdf', 'print', 'colvis']
+      }).buttons().container().appendTo('#miTabla_wrapper .col-md-6:eq(0)');
+    });
+  </script>
+<script>
+    $(function() {
+        $('.view-data').click(function() {
+            uni_modal("Recibo de Transaccion", "{% url 'pos:receipt-modal' %}?id=" + $(this).attr('data-id'))
+        })
+        $('.delete-data').click(function() {
+            _conf("Esta seguro de eliminar <b>" + $(this).attr('data-code') + "</b> del registro?", "delete_sale", [$(this).attr('data-id')])
+        })
+
+    })
+
+    function delete_sale($id) {
+        start_loader();
+        $.ajax({
+            headers: {
+                "X-CSRFToken": '{{csrf_token}}'
+            },
+            url: "{% url 'pos:delete-sale' %}",
+            method: "POST",
+            data: {
+                id: $id
+            },
+            dataType: "json",
+            error: err => {
+                console.log(err)
+                alert_toast("An error occured.", 'error');
+                end_loader();
+            },
+            success: function(resp) {
+                if (typeof resp == 'object' && resp.status == 'success') {
+                    location.reload();
+                } else {
+                    alert_toast("An error occured.", 'error');
+                    end_loader();
+                }
+            }
+        })
+    }
+</script>
+{% endblock ScriptBlock %}

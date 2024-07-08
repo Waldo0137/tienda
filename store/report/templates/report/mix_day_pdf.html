@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte de Ventas Diario</title>
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid black; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h2>Reporte de Ventas Diario</h2>
+    <p>Fecha: {{day_name}}, {{ day }}/{{ month_name }}/{{ year }}</p>
+    <p>Total Clientes: {{ total_clientes }}</p>
+    <p>Total Items Vendidos: {{ total_items_vendidos }}</p>
+    <p>Total Ingresos: {{ total_ingresos }}</p>
+    <p>Total de Ganancias Netas: {{ total_net_profit|floatformat:2 }}</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Cliente</th>
+                <th>Productos Cant. Vendidas</th>
+                <th>Precio Unit. - Coste Unit.</th>
+                <th>Grand Total</th>
+                <th>Ganancia Neta</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sale in sale_data %}
+            <tr>
+                <td>{{ sale.date_added }}</td>
+                <td>{{ sale.cliente }}</td>
+                <td>
+                    <ul>
+                        {% for product, details in sale.products_list.items %}
+                        <li>{{ product }}: {{ details.qty }}</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        {% for product, details in sale.products_list.items %}
+                        <li>{{ product }}: {{ details.price }} - {{ details.cost }}</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+                <td>{{ sale.grand_total }}</td>
+                <td>{{ sale.net_profit|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

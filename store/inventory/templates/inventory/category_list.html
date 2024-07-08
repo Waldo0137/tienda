@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block pageContent %}
+<style>
+  /* Estilos para las celdas de la tabla */
+  #miTabla td {
+    padding: 0.5rem; /* Espaciado interno reducido */
+    font-size: 0.9rem; /* Tamaño de fuente reducido */
+  }
+  
+  .link-cell a:hover {
+    text-decoration: underline; /* Subrayado al pasar el mouse */
+    background-color: #ecf0f1; /* Color de fondo al pasar el mouse */
+    color: #f5ad5e; /* Cambiar el color del texto al pasar el mouse */
+  }
+</style>
+
+<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
+  <div class="mdc-card py-2">
+    <div class="d-flex justify-content-between align-items-center">
+      <h4 class="card-title mb-0">Lista de Categoría</h4>
+      <div class="text-start">
+        <a href="{% url 'inventory:category_create' %}" class="btn btn-primary btn-sm">Nuevo Categoría</a>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
+  <div class="mdc-card">
+    <div class="table-responsive">
+      <table id="miTabla" class="table table-striped table-bordered datatable">
+        <thead>
+          <tr>
+            <th>Nombre de Categoría</th>
+            <th>Descripcion</th>
+            <th>Productos Asociados</th>
+            <th>Fecha de Creacion</th>
+            <th>Fecha Última de Actualización</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for category in categories %}
+            <tr>
+              <td class="link-cell text-center"><a href="{% url 'inventory:category_products' category.id %}">{{ category.name }}</a></td>
+              <td class="text-center">{{ category.description }}</td>
+              <td class="text-center">{{ category.product_count }}</td>
+              <td class="text-center">{{ category.date_added|date:'d-m-Y H:i' }}</td>
+              <td class="text-center">{{ category.date_updated|date:'d-m-Y H:i' }}</td>
+              <td class="text-center">
+              <a href="{% url 'inventory:category_update' category.pk %}" class="btn btn-primary btn-sm" title="Editar">
+                  <i class="mdi mdi-pencil"></i>
+              </a>
+              <a href="{% url 'inventory:category_delete' category.pk %}" class="btn btn-danger btn-sm" title="Eliminar">
+                  <i class="mdi mdi-delete"></i>
+              </a>
+            </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block ScriptBlock %}
+  <script>
+    $(document).ready(function() {
+      $('#miTabla').DataTable({
+        "paging": true,
+        "ordering": true,
+        "searching": true,
+        "responsive": true,
+        "lengthChange": false,
+        "autoWidth": false,
+        "order": [[4, "desc"]], 
+        "buttons": ['copy', 'csv', 'excel', 'pdf', 'print', 'colvis']
+      }).buttons().container().appendTo('#miTabla_wrapper .col-md-6:eq(0)');
+    });
+  </script>
+{% endblock %}
+

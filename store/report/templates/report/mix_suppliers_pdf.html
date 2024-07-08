@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Proveedores</title>
+    <style>
+        /* Estilos CSS opcionales para tu documento */
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Freycar</h1>
+    <h1>Lista de Proveedores</h1>
+    <p>Fecha de generación del informe: {{ current_date|date:"d/m/Y H:i:s" }}</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Información de Contacto</th>
+                <th>Fecha de Registro</th>
+                <th>Última Actualización</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for supplier in suppliers %}
+            <tr>
+                <td>{{ supplier.name }}</td>
+                <td>{{ supplier.contact_info }}</td>
+                <td>{{ supplier.date_added|date:"d/m/Y H:i:s" }}</td>
+                <td>{{ supplier.date_updated|date:"d/m/Y H:i:s" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

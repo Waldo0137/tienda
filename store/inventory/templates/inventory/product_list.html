@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block pageContent %}
+<style>
+  /* Estilos para las celdas de la tabla */
+  #miTabla td {
+    padding: 0.5rem; /* Espaciado interno reducido */
+    font-size: 0.9rem; /* Tamaño de fuente reducido */
+    text-align: center; /* Alineación centrada del texto */
+  }
+
+  /* Estilos para los enlaces en las celdas de la tabla */
+  .link-cell {
+    padding: 10px; /* Espaciado interno */
+  }
+
+  .link-cell a {
+    color: #007bff; /* Color del texto del enlace */
+    text-decoration: none; /* Quitar subrayado */
+  }
+
+  
+  .link-cell a:hover {
+    text-decoration: underline; /* Subrayado al pasar el mouse */
+    background-color: #ecf0f1; /* Color de fondo al pasar el mouse */
+    color: #f5ad5e; /* Cambiar el color del texto al pasar el mouse */
+  }
+  
+  
+</style>
+
+<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
+  <div class="mdc-card py-2">
+    <div class="d-flex justify-content-between align-items-center">
+      <h4 class="card-title mb-0">Lista de Productos</h4>
+      <div class="text-start">
+        <a href="{% url 'inventory:product_create' %}" class="btn btn-primary btn-sm">Nuevo Producto</a>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
+  <div class="mdc-card">
+    <div class="table-responsive">
+      <table id="miTabla" class="table table-striped table-bordered datatable">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Nombre de Producto</th>
+            <th>Categoría</th>
+            <th>Costo</th>
+            <th>Cantidad</th>
+            <th>Precio</th>
+            <th>Estado</th>
+            <th>Fecha Última Actualización</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for product in products %}
+            <tr>
+              <td class="text-center">{{ product.code }}</td>
+              
+              <td class="link-cell">
+                <a href="{% url 'inventory:product_detail' product.pk %}">{{ product.name }}</a>
+              </td>
+              <td class="link-cell">
+                <a href="{% url 'inventory:category_products' product.category.id %}">
+                  {{ product.category.name }}
+                </a>
+              </td>
+
+              <td class="text-center">{{ product.cost }}</td>
+              <td class="text-center">{{ product.quantity }}</td>
+              <td class="text-center">{{ product.price }}</td>
+              
+              <td class="text-center">
+                {% if product.status == product.STATUS_ACTIVE %}
+                    <span class="badge bg-success">Activo</span>
+                {% elif product.status == product.STATUS_INACTIVE %}
+                    <span class="badge bg-warning">Inactivo</span>
+                {% else %}
+                    <span class="badge bg-secondary">Desconocido</span>
+                {% endif %}
+            </td>
+              <td class="text-center">{{ product.date_updated|date:'d-m-Y H:i' }}</td>
+              <td class="text-center">
+                <a href="{% url 'inventory:product_update' product.pk %}" class="btn btn-primary btn-sm" title="Editar">
+                  <i class="mdi mdi-pencil"></i>
+                </a>
+                <a href="{% url 'inventory:product_delete' product.pk %}" class="btn btn-danger btn-sm" title="Eliminar">
+                  <i class="mdi mdi-delete"></i>
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block ScriptBlock %}
+  <script>
+    $(document).ready(function() {
+      $('#miTabla').DataTable({
+        "paging": true,
+        "ordering": true,
+        "searching": true,
+        "responsive": true,
+        "lengthChange": false,
+        "autoWidth": false,
+        "order": [[7, "desc"]], 
+        "buttons": ['copy', 'csv', 'excel', 'pdf', 'print', 'colvis']
+      }).buttons().container().appendTo('#miTabla_wrapper .col-md-6:eq(0)');
+    });
+  </script>
+{% endblock %}

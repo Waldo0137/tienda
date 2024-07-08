@@ -1,0 +1,90 @@
+{% load humanize %}
+<style>
+    #uni_modal .modal-footer {
+        display: none
+    }
+</style>
+<div class="container-fluid">
+    <div id="outprint">
+        <div class="lh-1">
+            <center><small class="fw-bold">Punto de Venta </small></center>
+            <center><small class="fw-bold">Recibo no oficial</small></center>
+        </div>
+        <hr>
+        <div class="lh-1">
+            <div>
+                
+                <span>Fecha:</span> {{ formatted_date }}<br>
+
+                <span>Codigo de Transaccion:</span> {{ transaction.code }}
+            </div>
+        </div>
+        <div class="clear-fix py-3"></div>
+        <div class="lh-1">
+            <div class="d-flex w-100 align-items-end border-bottom">
+                <div class="col-2 text-center fw-bold">Cantidad</div>
+                <div class="col-6 text-center fw-bold">Producto</div>
+                <div class="col-4 text-center fw-bold">Monto</div>
+            </div>
+            {% for item in salesItems %}
+            <div class="d-flex w-100 align-items-end">
+                <div class="col-2 text-center fw-bold">{{ item.qty|intcomma|floatformat:0 }}</div>
+                <div class="col-6 fw-bold">
+                    <div class="lh-1">
+                        <small>{{ item.product }}</small><br>
+                        <small>{{ item.price|intcomma }}</small><br>
+                    </div>
+                </div>
+                <div class="col-4 text-end fw-bold">{{ item.total|intcomma }}</div>
+            </div>
+            {% endfor %}
+            <hr>
+            <div class="d-flex w-100 align-items-end">
+                <div class="col-6 text-start fw-bold">Total</div>
+                <div class="col-6 text-end fw-bold">{{ transaction.grand_total|intcomma }}</div>
+            </div>
+            <div class="d-flex w-100 align-items-end">
+                <div class="col-6 text-start fw-bold">Tax <small>(inclusive)</small>: {{ transaction.tax|intcomma }}%</div>
+                <div class="col-6 text-end fw-bold">{{ transaction.tax_amount|intcomma|floatformat:2 }}</div>
+            </div>
+            <div class="d-flex w-100 align-items-end">
+                <div class="col-6 text-start fw-bold">Tenedered</div>
+                <div class="col-6 text-end fw-bold">{{ transaction.tendered_amount|intcomma }}</div>
+            </div>
+            <div class="d-flex w-100 align-items-end">
+                <div class="col-6 text-start fw-bold">Change</div>
+                <div class="col-6 text-end fw-bold">{{ transaction.amount_change|intcomma }}</div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="clear-fix py-3"></div>
+    <div class="d-flex w-100 justify-content-end">
+        <button class="btn btn-light bg-gradient border rounded-0 btn-sm me-1" type="button" id="receipt_print"><i class="mdi mdi-printer"></i> Imprimir</button>
+        <button class="btn btn-secondary bg-gradient border rounded-0 btn-sm" type="button" data-bs-dismiss="modal"><i class="mdi mdi-close"></i> Cerrar</button>
+    </div>
+</div>
+<script>
+    $(function() {
+        $('#receipt_print').click(function() {
+            var head = $('head').clone()
+            var p = $('#outprint').clone()
+            var el = $("<div>")
+            head.append('<style>body{background-color:unset !important}</style>')
+            el.append(head)
+            el.find('title').text("Recibo - Vista Impresion")
+            el.append(p)
+            start_loader()
+            var nw = window.open('', '_blank', "width=800,height=800,left=300, top = 200")
+            nw.document.write(el.html())
+            nw.document.close()
+            setTimeout(() => {
+                nw.print()
+                setTimeout(() => {
+                    nw.close()
+                    end_loader()
+                }, 250)
+            }, 300)
+        })
+    })
+</script>

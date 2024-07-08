@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reporte de Ventas</title>
+    <style>
+        /* Añade aquí tus estilos CSS para el PDF */
+        body {
+            font-family: Arial, sans-serif;
+            size: letter; 
+        }
+        header, footer {
+            width: 100%;
+            text-align: center;
+            position: fixed;
+        }
+        header {
+            top: 0;
+            border-bottom: 1px solid #000;
+        }
+        footer {
+            bottom: 0;
+            border-top: 1px solid #000;
+        }
+        .content {
+            margin-top: 100px; /* Ajustado para que el contenido no quede oculto por el encabezado fijo */
+            margin-bottom: 50px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .summary {
+            margin-top: 20px;
+            text-align: left;
+        }
+        /* Estilos específicos para los anchos de columna */
+        .col-clientes {
+            width: 15%;
+        }
+        .col-fecha-hora {
+            width: 20%;
+        }
+        .col-productos {
+            width: 40%; /* Ancho mayor para productos */
+        }
+        .col-total {
+            width: 15%;
+        }
+        .col-total-items {
+            width: 10%;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h2>FREYCAR</h2>
+        <p>Reporte de Ventas - Generado el: {{ current_date|date:'d-m-Y H:i' }}</p>
+        <p>Usuario: {{ username }}</p> <!-- Muestra el nombre del usuario -->
+    </header>
+    <div class="content">
+        <h2>Reporte Diario de Ventas</h2>
+        <h2>Reporte del dia {{ day }} de {{month_name}}, {{ year }}</h2>
+        {% load humanize %}
+        <table>
+            <thead>
+                <tr>
+                    {% comment %} !coste ganancia net {% endcomment %}
+                    <th class="col-clientes">Clientes</th>
+                    <th class="col-fecha-hora">Fecha y Hora</th>
+                    <th class="col-productos">Productos</th>
+                    <th class="col-total">Total</th>
+                    <th class="col-total-items">Cantidad Total Items</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sale in sale_data %}
+                <tr>
+                    <td>{{ sale.cliente }}</td>
+                    <td>{{ sale.date_added|date:'d-m-Y H:i' }}</td>
+                    <td>
+                        {% if sale.products_list %}
+                            {% for product, quantity in sale.products_list.items %}
+                                {{ product|capfirst }} - {{ quantity }}<br>
+                            {% endfor %}
+                        {% endif %}
+                    </td>
+                    <td>{{ sale.grand_total|floatformat:2|intcomma }} Bs</td>
+                    <td>{{ sale.total_items_sold }}</td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td colspan="4" class="summary">
+                        <h4>Resumen General</h4>
+                        <p>Total de Clientes: {{ total_clientes }}</p>
+                        <p>Cantidad Total de Items Vendidos: {{ total_items_vendidos }}</p>
+                        <p>Total de Ventas: {{ total_ingresos|floatformat:2|intcomma }} Bs</p>
+                    </td>
+                    <td colspan="1"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <footer>
+        <!-- <p>Contact: example@example.com | Tel: 123-456-7890 | Web: www.example.com</p> -->
+        <p style="text-align: right;">Clave Única: {{ unique_key }}</p> <!-- Muestra la clave única en el pie de página -->
+    </footer>
+</body>
+</html>

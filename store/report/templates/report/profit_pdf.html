@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Reporte de Ganancias</title>
+
+    <!-- Estilos CSS -->
+    <style type="text/css">
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header,
+        footer {
+            width: 100%;
+            text-align: center;
+            position: fixed;
+            background-color: #f2f2f2;
+            padding: 10px 0;
+        }
+
+        header {
+            top: 0;
+            border-bottom: 1px solid #000;
+        }
+
+        footer {
+            bottom: 0;
+            border-top: 1px solid #000;
+        }
+
+        .content {
+            margin: 120px 20px 60px 20px;
+        }
+
+        .summary {
+            padding: 10px;
+            border: 1px solid #000;
+            margin-top: 20px;
+        }
+
+        .summary p {
+            margin: 5px 0;
+        }
+
+        .summary h3 {
+            margin-top: 0;
+            background-color: #f2f2f2;
+            padding: 5px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .report-table th,
+        .report-table td {
+            padding: 10px;
+            border: 1px solid #000;
+            text-align: center;
+        }
+
+        .report-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        
+        .report-cell-cliente {
+            width: 20%; /* Ajusta el ancho de la columna cliente según sea necesario */
+    
+    
+            white-space: nowrap; /* Evitar salto de línea */
+            overflow: hidden; /* Ocultar el desbordamiento */
+            text-overflow: ellipsis; /* Añadir puntos suspensivos si el texto es demasiado largo */
+    
+        }
+        .report-cell-fagregado {
+            width: 15%; /* Ancho de la columna productos */
+            
+            white-space: nowrap; /* Evitar salto de línea */
+            overflow: hidden; /* Ocultar el desbordamiento */
+            text-overflow: ellipsis;
+        }
+        .report-cell-productos {
+            width: 25%; /* Ancho de la columna productos */
+
+            white-space: nowrap; /* Evitar salto de línea */
+            overflow: hidden; /* Ocultar el desbordamiento */
+            text-overflow: ellipsis; /* Añadir puntos suspensivos si el texto es demasiado largo */
+            
+        }
+        
+        .report-cell-total {
+            width: 20%; /* Ancho de la columna productos */
+            
+            white-space: nowrap; /* Evitar salto de línea */
+            overflow: hidden; /* Ocultar el desbordamiento */
+            text-overflow: ellipsis;
+        }
+        
+        .report-cell-titems {
+            width: 25%; /* Ancho de la columna productos */
+
+            
+            white-space: nowrap; /* Evitar salto de línea */
+            overflow: hidden; /* Ocultar el desbordamiento */
+            text-overflow: ellipsis;
+        }
+
+        .report-cell {
+            padding: 1px; /* Ajusta el padding para controlar el alto de las celdas */
+            border: 1px solid #000;
+            text-align: center;
+            line-height: 1; /* Ajusta según tus necesidades */
+        }
+
+        
+    </style>
+</head>
+<body>
+    <header>
+        <h2>FREYCAR</h2>
+        <p>Reporte de Ganancias - Generado el: {{ current_date|date:'d-m-Y H:i' }}</p>
+        <p>Usuario: {{ username }}</p>
+    </header>
+    <div class="content">
+        <h2>Reporte General de Ganancias</h2>
+        {% load humanize %}
+        <table class="report-table">
+            <thead>
+                <tr>
+                    <th class="report-cell report-cell-productos">Productos - Costo/u</th>
+                    <th class="report-cell report-cell-total">Venta Total - Cant. Unidades Vendidas</th>
+                    <th class="report-cell report-cell-cliente">Ganancias Por Ventas</th>
+                    <th class="report-cell report-cell-titems">Compra Total - Cant. Unidades Compradas</th>
+                    <th class="report-cell report-cell-fagregado">Ganancia General</th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                {% for sale in sales_data %}
+                {% for product in sale.products_list %}
+                <tr>
+                    
+                    <td>{{ product.product_name }} - {{ product.cost_per_unit|floatformat:2|intcomma }} Bs</td>
+                    <td>{{ sale.costo_total|floatformat:2|intcomma }} Bs - {{ product.total_qty_vendida }} unidades</td>
+                    <td>{{ product.product_ganancia|floatformat:2|intcomma }} Bs </td>
+                    <td>{{ product.total_gasto_compras|floatformat:2|intcomma }}  Bs - {{ product.total_qty_comprada }} unidades</td>
+                    <td>{{ product.ganancia_bruta|floatformat:2|intcomma }} Bs</td> <!-- Nuevo campo -->
+                    
+                </tr>
+                {% endfor %}
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        
+        <div class="summary">
+            <h3>Resumen General</h3>
+            <p>Total de Ventas: {{ total_ingresos|floatformat:2|intcomma }} Bs</p>
+            <p>Total de Costos: {{ total_costos|floatformat:2|intcomma }} Bs</p>
+            <p>Ganancia Neta: {{ total_ganancia|floatformat:2|intcomma }} Bs</p>
+            <p>Utilidades(Ganancias/Perdidas): {{ total_utilidades|floatformat:2|intcomma }} Bs</p>
+        </div>
+    </div>
+    <footer>
+        <p style="text-align: right;">Clave Única: {{ unique_key }}</p>
+    </footer>
+</body>
+
+</html>

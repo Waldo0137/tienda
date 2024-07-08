@@ -1,0 +1,177 @@
+{% extends 'home.html' %}
+
+{% block pageContent %}
+<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
+    <div class="mdc-card py-2">
+        <div class="d-flex justify-content-between align-items-center">
+            <h4 class="card-title mb-0">Actualización de Producto</h4>
+        </div>
+    </div>
+</div>
+<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
+    <div class="mdc-card">
+        <div class="p-4">
+            <form method="post" class="product-form">
+                {% csrf_token %}
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label for="{{ form.code.id_for_label }}" class="form-label">{{ form.code.label }}</label>
+                        {{ form.code }}
+                        {% if form.code.errors %}
+                            <div class="text-danger">
+                                {% for error in form.code.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.category.id_for_label }}" class="form-label">{{ form.category.label }}</label>
+                        {{ form.category }}
+                        {% if form.category.errors %}
+                            <div class="text-danger">
+                                {% for error in form.category.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label for="{{ form.name.id_for_label }}" class="form-label">{{ form.name.label }}</label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                            <div class="text-danger">
+                                {% for error in form.name.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }}</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                            <div class="text-danger">
+                                {% for error in form.description.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label for="{{ form.price.id_for_label }}" class="form-label">{{ form.price.label }}</label>
+                        {{ form.price }}
+                        {% if form.price.errors %}
+                            <div class="text-danger">
+                                {% for error in form.price.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label class="form-label">{{ form.status.label }}</label>
+                        {% if form.instance.status %}
+                            <span class="badge bg-success">Activo</span>
+                        {% else %}
+                            <span class="badge bg-warning">Inactivo</span>
+                        {% endif %}
+                        {% if form.status.errors %}
+                            <div class="text-danger">
+                                {% for error in form.status.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label class="form-label">Fecha de Creación</label>
+                        <p>{{ products.date_added }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Fecha de Actualización</label>
+                        <p>{{ products.date_updated }}</p>
+                    </div>
+                </div>
+                <div class="form-group row mt-3">
+                    <div class="col-12 d-flex justify-content-between">
+                        <div class="btn-group">
+                            <a href="{% url 'inventory:product_list' %}" class="btn btn-secondary">Volver a la lista de categorías</a>
+                            <button type="submit" class="btn btn-success">Actualizar</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            {% if form.errors %}
+            <div class="text-danger mt-3">
+                <ul>
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block ScriptBlock %}
+<script>
+    
+</script>
+<style>
+    .container {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+    }
+    .btn-success {
+        background-color: #28a745;
+    }
+    .btn-secondary {
+        background-color: #6c757d;
+    }
+    .form-group.row {
+        display: flex;
+        flex-wrap: nowrap;
+        margin-bottom: 10px;  /* Reduced margin to bring fields closer */
+    }
+    .form-group .col-md-6 {
+        flex: 1;
+        padding-right: 10px;  /* Adjust padding to make fields closer */
+    }
+    .form-group .col-md-6:last-child {
+        padding-right: 0;
+    }
+    .form-label {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    .text-danger p {
+        margin: 0;
+    }
+    .btn-group {
+        display: flex;
+        gap: 10px; /* Adjust the spacing between buttons as needed */
+    }
+</style>
+<script>
+    $(function() {
+        // Custom JS can be added here if needed for further enhancement
+    });
+</script>
+{% endblock %}

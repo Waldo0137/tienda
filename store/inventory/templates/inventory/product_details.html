@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block pageContent %}
+
+<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
+  <div class="mdc-card py-2">
+    <div class="d-flex justify-content-between align-items-center">
+      <h4 class="card-title mb-0">Detalles de {{ product.name }}</h4>
+    </div>
+  </div>
+</div>
+<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
+  <div class="mdc-card">
+    <div class="card-body">
+      <p><strong>Código:</strong> {{ product.code }}</p>
+      <p><strong>Nombre:</strong> {{ product.name }}</p>
+      <p><strong>Descripción:</strong> {{ product.description }}</p>
+      <p><strong>Costo:</strong> {{ product.cost }}</p>
+      <p><strong>Precio:</strong> {{ product.price }}</p>
+      <p><strong>Cantidad en Stock:</strong> {{ product.quantity }}</p>
+      <p><strong>Cantidad Histórica:</strong> {{ cantidad_historica }}</p>
+      <td class="text-center">
+        <a href="{% url 'inventory:product_list' %}" class="btn btn-success btn-sm" title="Lista de Productos">
+          <i class="mdi mdi-view-list"></i>
+        </a>
+        
+        <a href="{% url 'inventory:product_update' product.pk %}" class="btn btn-primary btn-sm" title="Editar">
+          <i class="mdi mdi-pencil"></i>
+        </a>
+        <a href="{% url 'inventory:product_delete' product.pk %}" class="btn btn-danger btn-sm" title="Eliminar">
+          <i class="mdi mdi-delete"></i>
+        </a>
+      </td>
+    </div>
+  </div>
+</div>
+{% endblock %}
