@@ -29,7 +29,7 @@ This project is a Point of Sale (POS) system designed to optimize retail operati
     ```bash
     pip install pipenv
     pipenv install Django
-    pipenv install openxl
+    pipenv install openpyxl
     pipenv install html2pdf
     ```
 
