@@ -19,11 +19,11 @@ This project is a Point of Sale (POS) system designed to optimize retail operati
 ## Installation
 1. Clone the repository:
     ```bash
-    git clone https://github.com/username/pos-system.git
+    git clone https://github.com/username/tienda.git
     ```
 2. Navigate to the project directory:
     ```bash
-    cd pos-system
+    cd tienda
     ```
 3. Install the dependencies && 3rds parties:
     ```bash
